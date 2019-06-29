@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     [TestFixture]
-    public class MockDbContextBuilderTests {
+    public class Tests {
         [Test]
         public void Add_NewEntity_Persists() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
@@ -62,7 +62,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
 
             var mockQueryProvider = new Mock<IQueryProvider>();
-            var sqlParameter = new SqlParameter("SomeParameter2", "Value2");
+            var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
             mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
 
@@ -70,11 +70,51 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
             var context = mockContext.Object;
             
-            var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("someparameter2", "Value2")).ToList();
+            var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
 
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Any());
             CollectionAssert.AreEquivalent(list1, result);
+        }
+
+        [Test]
+        public void FromSql_SpecifiedStoredProcedureWithInvalidParameters_ReturnsEmptyEnumeration() {
+            var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+            var mockContext = contextToMock.CreateMockDbContext();
+
+            var testEntity1 = new TestEntity1();
+            var list1 = new List<TestEntity1> { testEntity1 };
+
+            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
+
+            var sqlParameters1 = new List<SqlParameter>
+            {
+                new SqlParameter("@apaaplicationName", "Test Application"),
+                new SqlParameter("@dffate", DateTime.Today),
+                new SqlParameter("@iddds", testEntity1.Id),
+                new SqlParameter("@issdsSeparator", ',')
+            };
+
+            var sqlParameters2 = new List<SqlParameter>
+            {
+                new SqlParameter("@applicationName", "Test Application"),
+                new SqlParameter("@date", DateTime.Today),
+                new SqlParameter("@ids", testEntity1.Id),
+                new SqlParameter("@idsSeparator", ',')
+            };
+
+            var mockQueryProvider = new Mock<IQueryProvider>();
+            mockQueryProvider.SetUpFromSql("ById", sqlParameters1, list1.AsQueryable());
+            mockDbSet.SetUpProvider(mockQueryProvider);
+            
+            var context = mockContext.Object;
+
+            var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_GetLocationsById] @applicationName, @date, @ids, @idsSeparator",
+                sqlParameters2.ElementAt(0), sqlParameters2.ElementAt(1), sqlParameters2.ElementAt(2), sqlParameters2.Last()).ToList();
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result.Any());
         }
 
         [Test]
@@ -117,7 +157,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             CollectionAssert.AreNotEquivalent(list1, result2);
             CollectionAssert.AreEquivalent(list2, result2);
 
-            var sqlParameter = new SqlParameter("SomeParameter", "SomeValue");
+            var sqlParameter = new SqlParameter("@SomeParameter", "SomeValue");
 
             mockQueryProvider.SetUpFromSql("[dbo].[sp_Specified2] @SomeParameter", new List<SqlParameter> { sqlParameter }, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);

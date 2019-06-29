@@ -49,7 +49,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             //  [NotNull] params object[] parameters)
 
             //return source.Provider.CreateQuery<TEntity>((Expression) Expression.Call((Expression) null, RelationalQueryableExtensions.FromSqlMethodInfo.MakeGenericMethod(typeof (TEntity)), source.Expression, (Expression) Expression.Constant((object) sql), (Expression) Expression.Constant((object) parameters)));
-            
+
             queryProviderMock.Setup(
                     p => p.CreateQuery<TEntity>(It.Is<MethodCallExpression>(mce => SpecifiedParametersMatchMethodCallExpression(mce, sql, sqlParameters)))
                 )
@@ -64,13 +64,50 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
 
         private static bool SqlMatchesMethodCallExpression(MethodCallExpression mce, string sql) {
             var mceRawSqlString = (RawSqlString)((ConstantExpression)mce.Arguments[1]).Value;
-            return mceRawSqlString.Format.Contains(sql, StringComparison.CurrentCultureIgnoreCase);
 
+            var result = mceRawSqlString.Format.Contains(sql, StringComparison.CurrentCultureIgnoreCase);
+            if (result) return mceRawSqlString.Format.Contains(sql, StringComparison.CurrentCultureIgnoreCase);
+            Console.WriteLine($"mceRawSqlString: {mceRawSqlString.Format}");
+            Console.WriteLine($"sql: {sql}");
+
+            return mceRawSqlString.Format.Contains(sql, StringComparison.CurrentCultureIgnoreCase);
         }
-        private static bool SpecifiedParametersMatchMethodCallExpression(MethodCallExpression mce, string sql, IEnumerable<SqlParameter> sqlParameters) {
+
+        private static bool SqlParametersMatchMethodCallExpression(MethodCallExpression mce, IEnumerable<SqlParameter> sqlParameters) {
             var mceParameters = ((object[])((ConstantExpression)mce.Arguments[2]).Value);
             var mceSqlParameters = GetSqlParameters(mceParameters).ToList();
-            return SqlMatchesMethodCallExpression(mce, sql) && !sqlParameters.Except(mceSqlParameters, new SqlParameterParameterNameAndValueEqualityComparer()).Any();
+
+            Console.WriteLine("mceSqlParameters:");
+            foreach (var parameter in mceSqlParameters) {
+                Console.WriteLine($"'{parameter.ParameterName}': '{parameter.Value}'");
+            }
+            Console.WriteLine("sqlParameters:");
+            foreach (var parameter in sqlParameters) {
+                Console.WriteLine($"'{parameter.ParameterName}': '{parameter.Value}'");
+            }
+
+            //foreach (var parameter in sqlParameters) {
+            //    var mceSqlParameter = mceSqlParameters.SingleOrDefault(p =>
+            //        p.ParameterName.Equals(parameter.ParameterName) && p.Value.ToString().Equals(p.Value));
+            //    if (mceSqlParameter == null) return false;
+            //}
+
+            return !sqlParameters.Except(mceSqlParameters, new SqlParameterParameterNameAndValueEqualityComparer()).Any();
+        }
+
+        private class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter> {
+            public override bool Equals(SqlParameter x, SqlParameter y) {
+                return x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase) &&
+                       x.Value.ToString().Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode(SqlParameter obj) {
+                return obj.ParameterName.ToLower().GetHashCode() + obj.Value.ToString().ToLower().GetHashCode();
+            }
+        }
+
+        private static bool SpecifiedParametersMatchMethodCallExpression(MethodCallExpression mce, string sql, IEnumerable<SqlParameter> sqlParameters) {
+            return SqlMatchesMethodCallExpression(mce, sql) && SqlParametersMatchMethodCallExpression(mce, sqlParameters);
         }
 
         private static IEnumerable<SqlParameter> GetSqlParameters(object[] parameters) {
@@ -84,17 +121,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
                 }
             }
             return result;
-        }
-
-        private class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter>, IEqualityComparer<SqlParameter> {
-            public override bool Equals(SqlParameter x, SqlParameter y) {
-                return x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase) &&
-                       x.Value.ToString().Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
-            }
-
-            public override int GetHashCode(SqlParameter obj) {
-                return obj.ParameterName.ToLower().GetHashCode() + obj.Value.ToString().ToLower().GetHashCode();
-            }
         }
 
         private static string StringifyFromSqlMethodCallExpression(MethodCallExpression mce) {

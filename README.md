@@ -98,7 +98,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
     var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
 
     var mockQueryProvider = new Mock<IQueryProvider>();
-    var sqlParameter = new SqlParameter("SomeParameter2", "Value2");
+    var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
     mockDbSet.SetUpProvider(mockQueryProvider);
 
@@ -106,7 +106,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
     var context = mockContext.Object;
             
-    var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("someparameter2", "Value2")).ToList();
+    var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
 
     Assert.IsNotNull(result);
     Assert.IsTrue(result.Any());

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq.Tests</PackageId>
-    <Version>0.0.4</Version>
+    <Version>0.0.5</Version>
     <Authors>rgvlee</Authors>
     <Company />
     <Description>Tests for the EntityFrameworkCore.DbContextBackedMock.Moq project.</Description>

@@ -30,8 +30,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var list2 = new List<TestEntity1> { testEntity2 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
-                    new SqlParameter("SomeParameter1", "@SomeParameter1Value"),
-                    new SqlParameter("SomeParameter2", "@SomeParameter2Value")
+                    new SqlParameter("@SomeParameter1", "SomeParameter1Value"),
+                    new SqlParameter("@SomeParameter2", "SomeParameter2Value")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
@@ -65,8 +65,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var list2 = new List<TestEntity1> { testEntity2 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
-                    new SqlParameter("SomeParameter1", "Value1"),
-                    new SqlParameter("SomeParameter2", "Value2")
+                    new SqlParameter("@SomeParameter1", "Value1"),
+                    new SqlParameter("@SomeParameter2", "Value2")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
@@ -100,8 +100,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var list2 = new List<TestEntity1> { testEntity2 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
-                new SqlParameter("SomeParameter1", "asdf"),
-                new SqlParameter("SomeParameter2", "1234")
+                new SqlParameter("@SomeParameter1", "asdf"),
+                new SqlParameter("@SomeParameter2", "1234")
             };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);

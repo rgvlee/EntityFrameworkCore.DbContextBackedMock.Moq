@@ -34,7 +34,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
         public string GetUsingStoredProcedureWithParametersSql => "[dbo].sp_StoredProcedureWithParameters @SomeParameter1 @SomeParameter2";
         public virtual IEnumerable<TEntity> GetUsingStoredProcedureWithParameters() {
-            return _context.Set<TEntity>().FromSql(GetUsingStoredProcedureWithParametersSql, new SqlParameter("SomeParameter1", "Value1"), new SqlParameter("SomeParameter2", "Value2"));
+            return _context.Set<TEntity>().FromSql(GetUsingStoredProcedureWithParametersSql, new SqlParameter("@SomeParameter1", "Value1"), new SqlParameter("@SomeParameter2", "Value2"));
         }
 
         public virtual void Add(TEntity entity) {
