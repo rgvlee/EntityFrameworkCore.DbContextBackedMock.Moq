@@ -29,7 +29,7 @@ public void Add_NewEntity_Persists() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
     var mockContext = contextToMock.CreateMockDbContext();
     var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-    mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+    mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
     var context = mockContext.Object;
     var testEntity1 = new TestEntity1();
@@ -64,12 +64,12 @@ public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
 
     var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
     mockDbSet.SetUpFromSql(list1.AsQueryable());
-    mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+    mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
     var context = mockContext.Object;
-                
+            
     var result = context.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
-	    
+
     Assert.IsNotNull(result);
     Assert.IsTrue(result.Any());
     CollectionAssert.AreEquivalent(list1, result);
@@ -102,7 +102,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
     mockDbSet.SetUpProvider(mockQueryProvider);
 
-    mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+    mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
     var context = mockContext.Object;
             

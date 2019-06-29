@@ -14,7 +14,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -40,7 +40,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
             mockDbSet.SetUpFromSql(list1.AsQueryable());
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             
@@ -66,7 +66,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
 
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             
@@ -82,7 +82,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var dbSet = context.Set<TestEntity1>();

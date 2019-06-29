@@ -14,7 +14,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -49,7 +49,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -84,7 +84,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -117,7 +117,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
             foreach (var testEntity in list1) {
@@ -141,7 +141,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
 
@@ -162,7 +162,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 
@@ -186,7 +186,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 
@@ -209,7 +209,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetupDbSet(contextToMock, mockDbSet);
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 
