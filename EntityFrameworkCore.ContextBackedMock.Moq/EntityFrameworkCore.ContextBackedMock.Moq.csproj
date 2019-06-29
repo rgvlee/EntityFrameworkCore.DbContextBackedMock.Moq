@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>EntityFrameworkCore.ContextBackedMock.Moq</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>rgvlee</Authors>
+    <Company />
+    <Description>Allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. Designed to work with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) often used for testing and provides functionality that's missing (e.g., the ability to include FromSql in your unit tests) plus the benefits of using a mocking framework (e.g., the ability to verify method invocation). If your using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, this library will do the heavy lifting for you.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
+    <PackageReference Include="Moq" Version="4.12.0" />
+  </ItemGroup>
+
+</Project>
