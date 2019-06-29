@@ -13,6 +13,10 @@ It's designed to work with the Microsoft InMemory provider (https://docs.microso
 often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where
 this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included
 in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation).</Description>
+    <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.ContextBackedMock.Moq</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.ContextBackedMock.Moq</RepositoryUrl>
+    <PackageTags>moq EntityFrameworkCore EntityFramework InMemory DbContext</PackageTags>
+    <PackageLicenseUrl>https://github.com/rgvlee/EntityFrameworkCore.ContextBackedMock.Moq/blob/master/License.txt</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
