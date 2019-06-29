@@ -116,4 +116,4 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
 ## The disclaimer
 
-The library sets up a lot of the DbContext functionality, but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked, flick me a message and I'll see what I can do.
+The library sets up a lot of the DbContext functionality but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked flick me a message and I'll see what I can do.
