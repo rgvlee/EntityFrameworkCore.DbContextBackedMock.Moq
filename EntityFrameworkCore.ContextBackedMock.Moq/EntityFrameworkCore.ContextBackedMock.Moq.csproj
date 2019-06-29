@@ -17,6 +17,7 @@ in your tests, as well as all of the benefits of using a mocking framework (e.g.
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.ContextBackedMock.Moq</RepositoryUrl>
     <PackageTags>moq EntityFrameworkCore EntityFramework InMemory DbContext</PackageTags>
     <PackageLicenseUrl>https://github.com/rgvlee/EntityFrameworkCore.ContextBackedMock.Moq/blob/master/License.txt</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2019 Lee Anderson</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
