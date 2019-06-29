@@ -7,7 +7,12 @@
     <Version>0.0.1</Version>
     <Authors>rgvlee</Authors>
     <Company />
-    <Description>Allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. Designed to work with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) often used for testing and provides functionality that's missing (e.g., the ability to include FromSql in your unit tests) plus the benefits of using a mocking framework (e.g., the ability to verify method invocation). If your using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, this library will do the heavy lifting for you.</Description>
+    <Description>Allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext.
+
+It's designed to work with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
+often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where
+this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included
+in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation).</Description>
   </PropertyGroup>
 
   <ItemGroup>
