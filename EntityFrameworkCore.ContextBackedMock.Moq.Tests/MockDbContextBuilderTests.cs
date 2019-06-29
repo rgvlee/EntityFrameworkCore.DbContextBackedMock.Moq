@@ -15,7 +15,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.AddMockDbSetFor<TestEntity1>();
-            var mockContext = builder.BuildMock();
+            var mockContext = builder.GetMockDbContext();
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -36,7 +36,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMock();
 
             builder.UseMockDbSetFor(mockDbSet);
-            var mockContext = builder.BuildMock();
+            var mockContext = builder.GetMockDbContext();
 
             var context = mockContext.Object;
             var dbSet = context.Set<TestEntity1>();
@@ -65,7 +65,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMock();
 
             builder.UseMockDbSetFor(mockDbSet);
-            var mockContext = builder.BuildMock();
+            var mockContext = builder.GetMockDbContext();
 
             var context = mockContext.Object;
             var dbSet = context.Set<TestEntity1>();

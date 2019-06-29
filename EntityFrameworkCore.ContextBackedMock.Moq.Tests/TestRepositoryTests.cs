@@ -17,7 +17,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.UseMockDbSetFor<TestEntity1>(mockDbSet);
-            var mockContext = builder.BuildMockedContext();
+            var mockContext = builder.GetMockedDbContext();
 
             var context = mockContext;
             var testEntity1 = new TestEntity1();
@@ -55,7 +55,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.UseMockDbSetFor<TestEntity1>(mockDbSet);
-            var mockContext = builder.BuildMockedContext();
+            var mockContext = builder.GetMockedDbContext();
 
             var context = mockContext;
             var testEntity1 = new TestEntity1();
@@ -93,7 +93,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.UseMockDbSetFor<TestEntity1>(mockDbSet);
-            var mockContext = builder.BuildMockedContext();
+            var mockContext = builder.GetMockedDbContext();
 
             var context = mockContext;
             var testEntity1 = new TestEntity1();
@@ -133,7 +133,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.AddMockDbSetFor<TestEntity1>();
-            var mockContext = builder.BuildMockedContext();
+            var mockContext = builder.GetMockedDbContext();
             var context = mockContext;
 
             var repository = new TestRepository<TestContext, TestEntity1>(context);
@@ -150,7 +150,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var builder = new MockDbContextBuilder<TestContext>(contextToMock);
             builder.AddMockDbSetFor<TestEntity1>();
-            var mockContext = builder.BuildMockedContext();
+            var mockContext = builder.GetMockedDbContext();
             var context = mockContext;
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
@@ -173,7 +173,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
 
             var builder = new MockDbContextBuilder<TestContext>(dbContext);
             builder.AddMockDbSetFor(dbSet);
-            var mockedContext = builder.BuildMockedContext();
+            var mockedContext = builder.GetMockedDbContext();
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
             dbSet.AddRange(list1);
@@ -197,7 +197,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
             
             var builder = new MockDbContextBuilder<TestContext>(dbContext);
             builder.AddMockDbSetFor<TestEntity1>();
-            var mockedContext = builder.BuildMockedContext();
+            var mockedContext = builder.GetMockedDbContext();
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
             mockedContext.Set<TestEntity1>().AddRange(list1);
@@ -217,7 +217,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
         public void Get_UsingAlmostFullyAutoSetUp_ReturnsExpectedResult() {
             var builder = new MockDbContextBuilder<TestContext>();
             builder.AddMockDbSetFor<TestEntity1>();
-            var mockedContext = builder.BuildMockedContext();
+            var mockedContext = builder.GetMockedDbContext();
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
             mockedContext.Set<TestEntity1>().AddRange(list1);

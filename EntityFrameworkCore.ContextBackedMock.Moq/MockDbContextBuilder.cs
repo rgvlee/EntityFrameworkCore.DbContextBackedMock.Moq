@@ -10,21 +10,28 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
         where TDbContext : DbContext {
 
         private readonly TDbContext _dbContext;
+        public TDbContext GetDbContext() => _dbContext;
+
         private readonly Mock<TDbContext> _mockDbContext;
+        public Mock<TDbContext> GetMockDbContext() => _mockDbContext;
+
+        public TDbContext GetMockedDbContext() => _mockDbContext.Object;
 
         public MockDbContextBuilder() {
             var options = new DbContextOptionsBuilder<TDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             _dbContext = (TDbContext)Activator.CreateInstance(typeof(TDbContext), options);
             _mockDbContext = new Mock<TDbContext>();
+            SetUpMockDbContext();
 
-            foreach (var dbSetPropertyInfo in _dbContext.GetPropertyInfoForAllDbSets()) {
+            //foreach (var dbSetPropertyInfo in _dbContext.GetPropertyInfoForAllDbSets()) {
 
-            }
+            //}
         }
 
         public MockDbContextBuilder(TDbContext dbContext) {
             _dbContext = dbContext;
             _mockDbContext = new Mock<TDbContext>();
+            SetUpMockDbContext();
         }
 
         public MockDbContextBuilder<TDbContext> AddMockDbSetFor<TEntity>() where TEntity : class {
@@ -60,14 +67,10 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
             return this;
         }
 
-        public Mock<TDbContext> BuildMock() {
+        public MockDbContextBuilder<TDbContext> SetUpMockDbContext() {
             _mockDbContext.Setup(m => m.SaveChanges()).Returns(() => _dbContext.SaveChanges());
             _mockDbContext.Setup(m => m.SaveChanges(It.IsAny<bool>())).Returns((bool acceptAllChangesOnSuccess) => _dbContext.SaveChanges(acceptAllChangesOnSuccess));
-            return _mockDbContext;
-        }
-
-        public TDbContext BuildMockedContext() {
-            return BuildMock().Object;
+            return this;
         }
     }
 }
