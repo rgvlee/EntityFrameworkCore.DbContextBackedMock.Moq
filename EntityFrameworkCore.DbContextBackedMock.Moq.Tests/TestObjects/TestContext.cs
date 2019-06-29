@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     public class TestContext : DbContext {
         public DbSet<TestEntity1> TestEntities { get; set; }
 

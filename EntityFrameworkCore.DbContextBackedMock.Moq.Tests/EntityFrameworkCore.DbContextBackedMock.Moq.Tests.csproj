@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <PackageId>EntityFrameworkCore.ContextBackedMock.Moq.Tests</PackageId>
-    <Version>0.0.1</Version>
+    <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq.Tests</PackageId>
+    <Version>0.0.2</Version>
     <Authors>rgvlee</Authors>
     <Company />
-    <Description>Tests for the EntityFrameworkCore.ContextBackedMock.Moq project.</Description>
+    <Description>Tests for the EntityFrameworkCore.DbContextBackedMock.Moq project.</Description>
+    <Product>EntityFrameworkCore.DbContextBackedMock.Moq.Tests</Product>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EntityFrameworkCore.ContextBackedMock.Moq\EntityFrameworkCore.ContextBackedMock.Moq.csproj" />
+    <ProjectReference Include="..\EntityFrameworkCore.DbContextBackedMock.Moq\EntityFrameworkCore.DbContextBackedMock.Moq.csproj" />
   </ItemGroup>
 
 </Project>

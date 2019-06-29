@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     public class TestRepository<TDbContext, TEntity> : IRepository<TEntity> 
         where TDbContext : DbContext
         where TEntity : class {

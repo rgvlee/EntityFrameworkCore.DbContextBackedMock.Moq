@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.ContextBackedMock.Moq.Tests {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     public class TestManager<TDbContext, TRepository, TEntity> : IManager<TEntity> where TDbContext: DbContext
         where TRepository : IRepository<TEntity>
         where TEntity : class {

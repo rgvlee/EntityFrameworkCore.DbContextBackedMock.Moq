@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EntityFrameworkCore.ContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     public static class DbSetExtensions {
-        public static Mock<DbSet<TEntity>> CreateMock<TEntity>(this DbSet<TEntity> dbSet) where TEntity : class {
+        public static Mock<DbSet<TEntity>> CreateMockDbSet<TEntity>(this DbSet<TEntity> dbSet) where TEntity : class {
             var mock = new Mock<DbSet<TEntity>>();
 
             mock.Setup(m => m.Add(It.IsAny<TEntity>())).Returns((TEntity entity) => dbSet.Add(entity));
@@ -43,7 +43,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
 
         public static Mock<DbSet<TEntity>> SetUpFromSql<TEntity>(this Mock<DbSet<TEntity>> mock, IQueryable<TEntity> fromSqlResult) where TEntity : class {
             var mockQueryProvider = new Mock<IQueryProvider>();
-            mockQueryProvider.AddFromSqlResult(fromSqlResult);
+            mockQueryProvider.SetupFromSql(fromSqlResult);
             mock.SetUpProvider(mockQueryProvider);
             return mock;
         }

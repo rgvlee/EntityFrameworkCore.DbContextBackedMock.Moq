@@ -9,16 +9,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace EntityFrameworkCore.ContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     public static class QueryProviderExtensions {
-        public static Mock<IQueryProvider> AddFromSqlResult<TEntity>(this Mock<IQueryProvider> queryProviderMock, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             queryProviderMock.Setup(p => p.CreateQuery<TEntity>(It.IsAny<MethodCallExpression>()))
                 .Returns(expectedFromSqlResult);
 
             return queryProviderMock;
         }
 
-        public static Mock<IQueryProvider> AddFromSqlResult<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
             //public static IQueryable<TEntity> FromSql<TEntity>(
@@ -40,7 +40,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
             return queryProviderMock;
         }
 
-        public static Mock<IQueryProvider> AddFromSqlResult<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<SqlParameter> sqlParameters, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<SqlParameter> sqlParameters, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
             //public static IQueryable<TEntity> FromSql<TEntity>(
@@ -51,7 +51,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
             //return source.Provider.CreateQuery<TEntity>((Expression) Expression.Call((Expression) null, RelationalQueryableExtensions.FromSqlMethodInfo.MakeGenericMethod(typeof (TEntity)), source.Expression, (Expression) Expression.Constant((object) sql), (Expression) Expression.Constant((object) parameters)));
             
             queryProviderMock.Setup(
-                    p => p.CreateQuery<TEntity>(It.Is<MethodCallExpression>(mce => ParametersMatchMethodCallExpression(mce, sql, sqlParameters)))
+                    p => p.CreateQuery<TEntity>(It.Is<MethodCallExpression>(mce => SpecifiedParametersMatchMethodCallExpression(mce, sql, sqlParameters)))
                 )
                 .Returns(expectedFromSqlResult.AsQueryable())
                 .Callback((MethodCallExpression mce) => {
@@ -64,13 +64,26 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
 
         private static bool SqlMatchesMethodCallExpression(MethodCallExpression mce, string sql) {
             var mceRawSqlString = (RawSqlString)((ConstantExpression)mce.Arguments[1]).Value;
-            return mceRawSqlString.Format.Equals(sql, StringComparison.CurrentCultureIgnoreCase);
+            return mceRawSqlString.Format.Contains(sql, StringComparison.CurrentCultureIgnoreCase);
 
         }
-        private static bool ParametersMatchMethodCallExpression(MethodCallExpression mce, string sql, IEnumerable<SqlParameter> sqlParameters) {
+        private static bool SpecifiedParametersMatchMethodCallExpression(MethodCallExpression mce, string sql, IEnumerable<SqlParameter> sqlParameters) {
             var mceParameters = ((object[])((ConstantExpression)mce.Arguments[2]).Value);
             var mceSqlParameters = GetSqlParameters(mceParameters).ToList();
-            return SqlMatchesMethodCallExpression(mce, sql) && sqlParameters.IsEquivalentTo(mceSqlParameters, new SqlParameterParameterNameAndValueEqualityComparer());
+            return SqlMatchesMethodCallExpression(mce, sql) && !sqlParameters.Except(mceSqlParameters, new SqlParameterParameterNameAndValueEqualityComparer()).Any();
+        }
+
+        private static IEnumerable<SqlParameter> GetSqlParameters(object[] parameters) {
+            var result = new List<SqlParameter>();
+
+            if (!parameters.Any()) return result;
+
+            foreach (var parameter in parameters) {
+                if (parameter is SqlParameter sqlParameter) {
+                    result.Add(sqlParameter);
+                }
+            }
+            return result;
         }
 
         private class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter>, IEqualityComparer<SqlParameter> {
@@ -80,7 +93,7 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
             }
 
             public override int GetHashCode(SqlParameter obj) {
-                return obj.ParameterName.GetHashCode() + obj.Value.GetHashCode();
+                return obj.ParameterName.ToLower().GetHashCode() + obj.Value.ToString().ToLower().GetHashCode();
             }
         }
 
@@ -105,19 +118,6 @@ namespace EntityFrameworkCore.ContextBackedMock.Moq {
             }
 
             return sb.ToString();
-        }
-
-        private static IEnumerable<SqlParameter> GetSqlParameters(object[] parameters) {
-            var result = new List<SqlParameter>();
-
-            if (!parameters.Any()) return result;
-
-            foreach (var parameter in parameters) {
-                if (parameter is SqlParameter sqlParameter) {
-                    result.Add(sqlParameter);
-                }
-            }
-            return result;
         }
     }
 }
