@@ -14,7 +14,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -28,12 +28,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockQueryProvider = new Mock<IQueryProvider>();
             var list1 = new List<TestEntity1> { testEntity1 };
             var list2 = new List<TestEntity1> { testEntity2 };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
                     new SqlParameter("SomeParameter1", "@SomeParameter1Value"),
                     new SqlParameter("SomeParameter2", "@SomeParameter2Value")
                 };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithNoParameters().ToList();
@@ -49,7 +49,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -63,12 +63,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockQueryProvider = new Mock<IQueryProvider>();
             var list1 = new List<TestEntity1> { testEntity1 };
             var list2 = new List<TestEntity1> { testEntity2 };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
                     new SqlParameter("SomeParameter1", "Value1"),
                     new SqlParameter("SomeParameter2", "Value2")
                 };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
@@ -84,7 +84,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
@@ -98,12 +98,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockQueryProvider = new Mock<IQueryProvider>();
             var list1 = new List<TestEntity1> { testEntity1 };
             var list2 = new List<TestEntity1> { testEntity2 };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithNoParametersSql, list1.AsQueryable());
             var sqlParameters = new List<SqlParameter> {
                 new SqlParameter("SomeParameter1", "asdf"),
                 new SqlParameter("SomeParameter2", "1234")
             };
-            mockQueryProvider.SetupFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
+            mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
             mockDbSet.SetUpProvider(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
@@ -117,7 +117,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
             foreach (var testEntity in list1) {
@@ -141,7 +141,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var context = mockContext.Object;
 
@@ -162,7 +162,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 
@@ -186,7 +186,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 
@@ -209,7 +209,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var mockContext = contextToMock.CreateMockDbContext();
             var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.AddSetupForDbSet(contextToMock, mockDbSet);
+            mockContext.SetupDbSet(contextToMock, mockDbSet);
 
             var mockedContext = mockContext.Object;
 

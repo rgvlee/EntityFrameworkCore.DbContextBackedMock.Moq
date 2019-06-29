@@ -24,23 +24,23 @@ namespace EntityFrameworkCore.DbContextBackedMock {
             return mock;
         }
 
-        public static Mock<TDbContext> AddSetupForDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
+        public static Mock<TDbContext> SetupDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
             TDbContext dbContext)
             where TDbContext : DbContext
             where TEntity : class {
 
-            return mockDbContext.AddSetupForDbSet(dbContext, dbContext.Set<TEntity>().CreateMockDbSet());
+            return mockDbContext.SetupDbSet(dbContext, dbContext.Set<TEntity>().CreateMockDbSet());
         }
 
-        public static Mock<TDbContext> AddSetupForDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
+        public static Mock<TDbContext> SetupDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
             TDbContext dbContext, DbSet<TEntity> dbSet)
             where TDbContext : DbContext
             where TEntity : class {
 
-            return mockDbContext.AddSetupForDbSet(dbContext, dbSet.CreateMockDbSet());
+            return mockDbContext.SetupDbSet(dbContext, dbSet.CreateMockDbSet());
         }
 
-        public static Mock<TDbContext> AddSetupForDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
+        public static Mock<TDbContext> SetupDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
             TDbContext dbContext, Mock<DbSet<TEntity>> mockDbSet)
             where TDbContext : DbContext
             where TEntity : class {

@@ -43,7 +43,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
 
         public static Mock<DbSet<TEntity>> SetUpFromSql<TEntity>(this Mock<DbSet<TEntity>> mock, IQueryable<TEntity> fromSqlResult) where TEntity : class {
             var mockQueryProvider = new Mock<IQueryProvider>();
-            mockQueryProvider.SetupFromSql(fromSqlResult);
+            mockQueryProvider.SetUpFromSql(fromSqlResult);
             mock.SetUpProvider(mockQueryProvider);
             return mock;
         }

@@ -99,7 +99,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
     var mockQueryProvider = new Mock<IQueryProvider>();
     var sqlParameter = new SqlParameter("SomeParameter2", "Value2");
-    mockQueryProvider.SetupFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
+    mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
     mockDbSet.SetUpProvider(mockQueryProvider);
 
     mockContext.AddSetupForDbSet(contextToMock, mockDbSet);

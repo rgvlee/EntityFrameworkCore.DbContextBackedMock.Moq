@@ -11,14 +11,14 @@ using System.Text;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     public static class QueryProviderExtensions {
-        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             queryProviderMock.Setup(p => p.CreateQuery<TEntity>(It.IsAny<MethodCallExpression>()))
                 .Returns(expectedFromSqlResult);
 
             return queryProviderMock;
         }
 
-        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
             //public static IQueryable<TEntity> FromSql<TEntity>(
@@ -40,7 +40,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             return queryProviderMock;
         }
 
-        public static Mock<IQueryProvider> SetupFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<SqlParameter> sqlParameters, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<SqlParameter> sqlParameters, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
             //public static IQueryable<TEntity> FromSql<TEntity>(
