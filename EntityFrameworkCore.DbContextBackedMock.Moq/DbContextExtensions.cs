@@ -1,4 +1,3 @@
-using EntityFrameworkCore.DbContextBackedMock.Moq;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
@@ -6,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace EntityFrameworkCore.DbContextBackedMock {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     public static class DbContextExtensions {
         public static IEnumerable<PropertyInfo> GetPropertyInfoForAllDbSets(this DbContext context) {
             var properties = context.GetType().GetProperties().Where(p =>
