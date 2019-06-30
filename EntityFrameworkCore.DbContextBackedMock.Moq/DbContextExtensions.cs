@@ -40,6 +40,18 @@ namespace EntityFrameworkCore.DbContextBackedMock {
             return mockDbContext.SetUpDbSet(dbContext, dbSet.CreateMockDbSet());
         }
 
+        //public static Mock<TDbContext> SetUpAllDbSets<TDbContext>(this Mock<TDbContext> mockDbContext, TDbContext dbContext)
+        //    where TDbContext : DbContext {
+
+        //    foreach (var propertyInfo in dbContext.GetPropertyInfoForAllDbSets()) {
+        //        var dbSetPropertyName = propertyInfo.Name;
+        //        var dbSetPropertyType = propertyInfo.PropertyType;
+        //        var entityType = propertyInfo.PropertyType.GenericTypeArguments.First();
+        //    }
+
+        //    return mockDbContext;
+        //}
+
         public static Mock<TDbContext> SetUpDbSet<TDbContext, TEntity>(this Mock<TDbContext> mockDbContext,
             TDbContext dbContext, Mock<DbSet<TEntity>> mockDbSet)
             where TDbContext : DbContext
