@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -168,6 +169,33 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             Assert.IsTrue(result3.Any());
             CollectionAssert.AreNotEquivalent(list1, result3);
             CollectionAssert.AreEquivalent(list2, result3);
+        }
+
+        [Test]
+        public void FromSql_SpecifiedStoredProcedureWithNullParameterValue_ReturnsExpectedResult()
+        {
+            var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+            var mockContext = contextToMock.CreateMockDbContext();
+
+            var testEntity1 = new TestEntity1();
+            var list1 = new List<TestEntity1> { testEntity1 };
+
+            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
+
+            var mockQueryProvider = new Mock<IQueryProvider>();
+            var sqlParameter = new SqlParameter("@SomeParameter2", SqlDbType.DateTime);
+            mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
+            mockDbSet.SetUpProvider(mockQueryProvider);
+
+            mockContext.SetUpDbSet(contextToMock, mockDbSet);
+
+            var context = mockContext.Object;
+
+            var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", SqlDbType.DateTime)).ToList();
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Any());
+            CollectionAssert.AreEquivalent(list1, result);
         }
     }
 }

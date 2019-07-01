@@ -96,13 +96,29 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         }
 
         private class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter> {
-            public override bool Equals(SqlParameter x, SqlParameter y) {
-                return x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase) &&
-                       x.Value.ToString().Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
+            public override bool Equals(SqlParameter x, SqlParameter y)
+            {
+                var parameterNameIsEqual =
+                    x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase);
+
+                var valueIsEqual = false;
+                if (x.Value == null && y.Value == null)
+                    valueIsEqual = true;
+                else if (x.Value != null && y.Value == null || x.Value == null && y.Value != null)
+                    valueIsEqual = false;
+                else
+                    valueIsEqual = x.Value.ToString()
+                        .Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
+
+                return parameterNameIsEqual && valueIsEqual;
             }
 
-            public override int GetHashCode(SqlParameter obj) {
-                return obj.ParameterName.ToLower().GetHashCode() + obj.Value.ToString().ToLower().GetHashCode();
+            public override int GetHashCode(SqlParameter obj)
+            {
+                var hashCode = obj.ParameterName.ToLower().GetHashCode();
+                if(obj.Value != null)
+                    hashCode += obj.Value.ToString().ToLower().GetHashCode();
+                return hashCode;
             }
         }
 
@@ -140,7 +156,10 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             foreach (var sqlParameter in sqlParameters) {
                 sb.Append(sqlParameter.ParameterName);
                 sb.Append(": ");
-                sb.AppendLine(sqlParameter.Value.ToString());
+                if (sqlParameter.Value == null)
+                    sb.AppendLine("null");
+                else
+                    sb.AppendLine(sqlParameter.Value.ToString());
             }
 
             return sb.ToString();
