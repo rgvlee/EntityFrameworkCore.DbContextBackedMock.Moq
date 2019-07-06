@@ -26,7 +26,7 @@
         </member>
         <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1">
             <summary>
-            The base for mock builders.
+            A builder that creates a DbContext mock.
             </summary>
             <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
         </member>

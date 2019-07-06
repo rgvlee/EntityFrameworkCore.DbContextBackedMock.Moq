@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Moq;
+using System.Threading;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// <summary>
@@ -33,37 +35,23 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             DbContextToMock = dbContextToMock;
             DbContextMock = dbContextMock;
 
-            DbSetToMock = DbContextToMock.Set<TEntity>();
+            //DbSetToMock = DbContextToMock.Set<TEntity>();
+            DbSetToMock =(DbSet<TEntity>)((IDbSetCache) dbContextToMock).GetOrAddSet(((IDbContextDependencies) dbContextToMock).SetSource, typeof(TEntity));
             DbSetMock = DbSetToMock.CreateDbSetMock();
             
-            DbContextMock.Setup(m => m.Set<TEntity>()).Returns(() => DbSetMock.Object);
-            
             DbContextMock.Setup(m => m.Add(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Add(entity));
-            DbContextMock.Setup(m => m.AddRange(It.IsAny<IEnumerable<object>>()))
-                .Callback((IEnumerable<object> entities) => DbContextToMock.AddRange(entities));
-            DbContextMock.Setup(m => m.AddRange(It.IsAny<object[]>()))
-                .Callback((object[] entities) => DbContextToMock.AddRange(entities));
-
-            DbContextMock.Setup(m => m.Find<TEntity>(It.IsAny<object[]>()))
-                .Returns((object[] keyValues) => DbSetMock.Object.Find(keyValues));
-            DbContextMock.Setup(m => m.Find(typeof(TEntity), It.IsAny<object[]>()))
-                .Returns((Type type, object[] keyValues) => DbSetMock.Object.Find(type, keyValues));
-
-            DbContextMock.Setup(m => m.Remove(It.IsAny<object>())).Returns((object entity) => DbContextToMock.Remove(entity));
-            DbContextMock.Setup(m => m.Remove(It.IsAny<TEntity>()))
-                .Returns((TEntity entity) => DbContextToMock.Remove(entity));
-            DbContextMock.Setup(m => m.RemoveRange(It.IsAny<IEnumerable<object>>()))
-                .Callback((IEnumerable<object> entities) => DbContextToMock.RemoveRange(entities));
-            DbContextMock.Setup(m => m.RemoveRange(It.IsAny<object[]>()))
-                .Callback((object[] entities) => DbContextToMock.RemoveRange(entities));
-
-            DbContextMock.Setup(m => m.Update(It.IsAny<object>())).Returns((object entity) => DbContextToMock.Update(entity));
-            DbContextMock.Setup(m => m.Update(It.IsAny<TEntity>()))
-                .Returns((TEntity entity) => DbContextToMock.Update(entity));
-            DbContextMock.Setup(m => m.UpdateRange(It.IsAny<IEnumerable<object>>()))
-                .Callback((IEnumerable<object> entities) => DbContextToMock.UpdateRange(entities));
-            DbContextMock.Setup(m => m.UpdateRange(It.IsAny<object[]>()))
-                .Callback((object[] entities) => DbContextToMock.UpdateRange(entities));
+            DbContextMock.Setup(m => m.AddAsync(It.IsAny<TEntity>(), It.IsAny<CancellationToken>())).Returns((TEntity entity, CancellationToken cancellationToken) => DbContextToMock.AddAsync(entity, cancellationToken));
+            DbContextMock.Setup(m => m.Attach(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Attach(entity));
+            DbContextMock.Setup(m => m.AttachRange(It.IsAny<object[]>())).Callback((object[] entities) => DbContextToMock.AttachRange(entities));
+            DbContextMock.Setup(m => m.AttachRange(It.IsAny<IEnumerable<object>>())).Callback((IEnumerable<object> entities) => DbContextToMock.AttachRange(entities));
+            DbContextMock.Setup(m => m.Entry(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Entry(entity));
+            DbContextMock.Setup(m => m.Find<TEntity>(It.IsAny<object[]>())).Returns((object[] keyValues) => DbContextToMock.Find<TEntity>(keyValues));
+            DbContextMock.Setup(m => m.Find(typeof(TEntity), It.IsAny<object[]>())).Returns((Type type, object[] keyValues) => DbContextToMock.Find(type, keyValues));
+            DbContextMock.Setup(m => m.FindAsync<TEntity>(It.IsAny<object[]>())).Returns((object[] keyValues) => DbContextToMock.FindAsync<TEntity>(keyValues));
+            DbContextMock.Setup(m => m.FindAsync<TEntity>(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).Returns((object[] keyValues, CancellationToken cancellationToken) => DbContextToMock.FindAsync<TEntity>(keyValues, cancellationToken));
+            DbContextMock.Setup(m => m.Remove(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Remove(entity));
+            DbContextMock.Setup(m => m.Set<TEntity>()).Returns(() => DbSetMock.Object);
+            DbContextMock.Setup(m => m.Update(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Update(entity));
         }
 
         /// <summary>
