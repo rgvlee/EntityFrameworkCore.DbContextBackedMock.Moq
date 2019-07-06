@@ -5,8 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+    /// <summary>
+    /// Extensions for DbSets.
+    /// </summary>
     public static class DbSetExtensions {
-        public static Mock<DbSet<TEntity>> CreateMockDbSet<TEntity>(this DbSet<TEntity> dbSet) where TEntity : class {
+        /// <summary>
+        /// Creates a DbSet mock for the specified entity.
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="dbSet">The DbSet to mock.</param>
+        /// <returns>A DbSet mock for the specified entity.</returns>
+        public static Mock<DbSet<TEntity>> CreateDbSetMock<TEntity>(this DbSet<TEntity> dbSet) where TEntity : class {
             var mock = new Mock<DbSet<TEntity>>();
 
             mock.Setup(m => m.Add(It.IsAny<TEntity>())).Returns((TEntity entity) => dbSet.Add(entity));
@@ -35,17 +44,31 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             return mock;
         }
 
-        public static Mock<DbSet<TEntity>> SetUpProvider<TEntity>(this Mock<DbSet<TEntity>> mock, Mock<IQueryProvider> queryProviderMock)
+        /// <summary>
+        /// Adds the mock set up for the specified query provider mock to the specified DbSet mock.
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="dbSetMock">The DbSet mock to add the additional set up to.</param>
+        /// <param name="queryProviderMock">The query provider mock.</param>
+        /// <returns>The DbSet mock.</returns>
+        public static Mock<DbSet<TEntity>> AddSetUpForProvider<TEntity>(this Mock<DbSet<TEntity>> dbSetMock, Mock<IQueryProvider> queryProviderMock)
             where TEntity : class {
-            mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
-            return mock;
+            dbSetMock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
+            return dbSetMock;
         }
 
-        public static Mock<DbSet<TEntity>> SetUpFromSql<TEntity>(this Mock<DbSet<TEntity>> mock, IQueryable<TEntity> fromSqlResult) where TEntity : class {
+        /// <summary>
+        /// Adds the mock set up for the FromSql method the specified DbSet mock.
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="dbSetMock">The DbSet mock to add the additional set up to.</param>
+        /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
+        /// <returns>The DbSet mock.</returns>
+        public static Mock<DbSet<TEntity>> AddSetUpForMockFromSql<TEntity>(this Mock<DbSet<TEntity>> dbSetMock, IEnumerable<TEntity> expectedFromSqlResult) where TEntity : class {
             var mockQueryProvider = new Mock<IQueryProvider>();
-            mockQueryProvider.SetUpFromSql(fromSqlResult);
-            mock.SetUpProvider(mockQueryProvider);
-            return mock;
+            mockQueryProvider.SetUpFromSql(expectedFromSqlResult);
+            dbSetMock.AddSetUpForProvider(mockQueryProvider);
+            return dbSetMock;
         }
     }
 }

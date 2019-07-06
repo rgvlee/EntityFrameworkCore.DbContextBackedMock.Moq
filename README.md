@@ -14,11 +14,14 @@ in your tests, as well as all of the benefits of using a mocking framework (e.g.
 If your using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, 
 this library will do the heavy lifting for you.
 
+Consumption is via a builder. Create the builder, tell it what DbSets to mock, add any FromSql mocks and off you go.
+
 ## Example Usage
 
 - Create an in memory DbContext
-- Create the mock DbContext
-- Create the mock DbSet and add it to the mock DbContext
+- Create the builder
+- Setup the mock DbSet
+- Get the db context mock
 - Consume
 
 Operations on the mock DbContext are funnelled through to the in memory DbContext. You can add/update/remove on either and both will yield the same result.
@@ -27,9 +30,8 @@ Operations on the mock DbContext are funnelled through to the in memory DbContex
 [Test]
 public void Add_NewEntity_Persists() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var mockContext = contextToMock.CreateMockDbContext();
-    var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-    mockContext.SetUpDbSet(contextToMock, mockDbSet);
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpDbSetFor<TestEntity1>();
+    var mockContext = builder.GetDbContextMock();
 
     var context = mockContext.Object;
     var testEntity1 = new TestEntity1();
@@ -38,7 +40,7 @@ public void Add_NewEntity_Persists() {
     context.Set<TestEntity1>().Add(testEntity1);
     context.SaveChanges();
     Assert.AreNotEqual(default(Guid), testEntity1.Id);
-            
+
     Assert.AreEqual(testEntity1, contextToMock.Find<TestEntity1>(testEntity1.Id));
     Assert.AreEqual(testEntity1, context.Find<TestEntity1>(testEntity1.Id));
 
@@ -57,17 +59,16 @@ and the operation invokes other DbContext/DbSet operations you may need to persi
 [Test]
 public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var mockContext = contextToMock.CreateMockDbContext();
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock);
 
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
 
-    var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-    mockDbSet.SetUpFromSql(list1.AsQueryable());
-    mockContext.SetUpDbSet(contextToMock, mockDbSet);
+    builder.AddSetUpDbSetFor<TestEntity1>().WithFromSqlResult(list1.AsQueryable());
 
+    var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-            
+
     var result = context.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
 
     Assert.IsNotNull(result);
@@ -90,22 +91,19 @@ Only FromSql SqlParameters provided to the query provider mock will be checked. 
 [Test]
 public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var mockContext = contextToMock.CreateMockDbContext();
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock);
 
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
 
-    var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-
     var mockQueryProvider = new Mock<IQueryProvider>();
     var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
-    mockDbSet.SetUpProvider(mockQueryProvider);
+    builder.AddSetUpDbSetFor<TestEntity1>().WithQueryProviderMock(mockQueryProvider);
 
-    mockContext.SetUpDbSet(contextToMock, mockDbSet);
-
+    var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-            
+
     var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
 
     Assert.IsNotNull(result);
@@ -113,6 +111,11 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
     CollectionAssert.AreEquivalent(list1, result);
 }
 ```
+
+## Fluent interface
+
+The builder provides a fluent interface for both DbContext and DbSet mocks. I've designed the API to be intuitive and discoverable. The examples above do touch on a bit of the available functionality.
+There are actually 2 builders, 1 for the DbContext and one for DbSets. Once you invoke a DbSet method you'll get the DbSet builder. This is deliberate as it provides explicit entity DbSet set up scoping.
 
 ## The disclaimer
 

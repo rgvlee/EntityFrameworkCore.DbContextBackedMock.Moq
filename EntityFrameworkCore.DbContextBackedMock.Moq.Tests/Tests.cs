@@ -13,10 +13,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void Add_NewEntity_Persists() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
-
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpDbSetFor<TestEntity1>();
+            var mockContext = builder.GetDbContextMock();
+            
             var context = mockContext.Object;
             var testEntity1 = new TestEntity1();
             Assert.AreEqual(default(Guid), testEntity1.Id);
@@ -34,15 +33,14 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
-
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock);
+            
             var testEntity1 = new TestEntity1();
             var list1 = new List<TestEntity1> { testEntity1 };
 
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockDbSet.SetUpFromSql(list1.AsQueryable());
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
+            builder.AddSetUpDbSetFor<TestEntity1>().WithFromSqlResult(list1.AsQueryable());
 
+            var mockContext = builder.GetDbContextMock();
             var context = mockContext.Object;
             
             var result = context.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
@@ -55,20 +53,17 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock);
 
             var testEntity1 = new TestEntity1();
             var list1 = new List<TestEntity1> { testEntity1 };
-
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-
+            
             var mockQueryProvider = new Mock<IQueryProvider>();
             var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
             mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
-            mockDbSet.SetUpProvider(mockQueryProvider);
+            builder.AddSetUpDbSetFor<TestEntity1>().WithQueryProviderMock(mockQueryProvider);
 
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
-
+            var mockContext = builder.GetDbContextMock();
             var context = mockContext.Object;
             
             var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
@@ -81,13 +76,10 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void FromSql_SpecifiedStoredProcedureWithInvalidParameters_ReturnsEmptyEnumeration() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock);
 
             var testEntity1 = new TestEntity1();
             var list1 = new List<TestEntity1> { testEntity1 };
-
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
 
             var sqlParameters1 = new List<SqlParameter>
             {
@@ -107,8 +99,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
             var mockQueryProvider = new Mock<IQueryProvider>();
             mockQueryProvider.SetUpFromSql("ById", sqlParameters1, list1.AsQueryable());
-            mockDbSet.SetUpProvider(mockQueryProvider);
-            
+            builder.AddSetUpDbSetFor<TestEntity1>().WithQueryProviderMock(mockQueryProvider);
+
+            var mockContext = builder.GetDbContextMock();
             var context = mockContext.Object;
 
             var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_GetLocationsById] @applicationName, @date, @ids, @idsSeparator",
@@ -121,9 +114,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void FromSql_SpecifiedStoredProcedure_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpDbSetFor<TestEntity1>();
+            var mockContext = builder.GetDbContextMock();
 
             var context = mockContext.Object;
             var dbSet = context.Set<TestEntity1>();
@@ -143,7 +135,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockQueryProvider = new Mock<IQueryProvider>();
             mockQueryProvider.SetUpFromSql(list1.AsQueryable());
             mockQueryProvider.SetUpFromSql("sp_Specified", list2.AsQueryable());
-            mockDbSet.SetUpProvider(mockQueryProvider);
+
+            builder.WithQueryProviderMock(mockQueryProvider);
 
             var result1 = dbSet.FromSql("sp_NoParams").ToList();
 
@@ -161,7 +154,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var sqlParameter = new SqlParameter("@SomeParameter", "SomeValue");
 
             mockQueryProvider.SetUpFromSql("[dbo].[sp_Specified2] @SomeParameter", new List<SqlParameter> { sqlParameter }, list2.AsQueryable());
-            mockDbSet.SetUpProvider(mockQueryProvider);
+
+            builder.WithQueryProviderMock(mockQueryProvider);
 
             var result3 = dbSet.FromSql("[dbo].[sp_Specified2] @SomeParameter", sqlParameter).ToList();
 
@@ -172,23 +166,19 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void FromSql_SpecifiedStoredProcedureWithNullParameterValue_ReturnsExpectedResult()
-        {
+        public void FromSql_SpecifiedStoredProcedureWithNullParameterValue_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var mockContext = contextToMock.CreateMockDbContext();
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock);
 
             var testEntity1 = new TestEntity1();
             var list1 = new List<TestEntity1> { testEntity1 };
 
-            var mockDbSet = contextToMock.Set<TestEntity1>().CreateMockDbSet();
-
             var mockQueryProvider = new Mock<IQueryProvider>();
             var sqlParameter = new SqlParameter("@SomeParameter2", SqlDbType.DateTime);
             mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
-            mockDbSet.SetUpProvider(mockQueryProvider);
+            builder.AddSetUpDbSetFor<TestEntity1>().WithQueryProviderMock(mockQueryProvider);
 
-            mockContext.SetUpDbSet(contextToMock, mockDbSet);
-
+            var mockContext = builder.GetDbContextMock();
             var context = mockContext.Object;
 
             var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", SqlDbType.DateTime)).ToList();

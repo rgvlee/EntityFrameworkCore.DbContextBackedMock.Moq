@@ -10,15 +10,33 @@ using System.Linq.Expressions;
 using System.Text;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+    /// <summary>
+    /// Extensions for query provider mocks.
+    /// </summary>
     public static class QueryProviderExtensions {
-        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        /// <summary>
+        /// Sets up DbSet FromSql invocations to return a specified sequence.
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="queryProviderMock">The query provider mock.</param>
+        /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
+        /// <returns>The query provider mock.</returns>
+        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IEnumerable<TEntity> expectedFromSqlResult) where TEntity : class {
             queryProviderMock.Setup(p => p.CreateQuery<TEntity>(It.IsAny<MethodCallExpression>()))
-                .Returns(expectedFromSqlResult);
+                .Returns(expectedFromSqlResult.AsQueryable());
 
             return queryProviderMock;
         }
 
-        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
+        /// <summary>
+        /// Sets up DbSet FromSql invocations for containing a specified sql string to return a specified sequence. 
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="queryProviderMock">The query provider mock.</param>
+        /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
+        /// <returns>The query provider mock.</returns>
+        public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
             //public static IQueryable<TEntity> FromSql<TEntity>(
@@ -40,6 +58,15 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             return queryProviderMock;
         }
 
+        /// <summary>
+        /// Sets up DbSet FromSql invocations for containing a specified sql string to return a specified sequence. 
+        /// </summary>
+        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <param name="queryProviderMock">The query provider mock.</param>
+        /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="sqlParameters">The FromSql sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
+        /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
+        /// <returns>The query provider mock.</returns>
         public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, string sql, IEnumerable<SqlParameter> sqlParameters, IQueryable<TEntity> expectedFromSqlResult) where TEntity : class {
             //Microsoft.EntityFrameworkCore.RelationalQueryableExtensions
 
@@ -86,37 +113,29 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
                 Console.WriteLine($"'{parameter.ParameterName}': '{parameter.Value}'");
             }
 
-            //foreach (var parameter in sqlParameters) {
-            //    var mceSqlParameter = mceSqlParameters.SingleOrDefault(p =>
-            //        p.ParameterName.Equals(parameter.ParameterName) && p.Value.ToString().Equals(p.Value));
-            //    if (mceSqlParameter == null) return false;
-            //}
-
             return !sqlParameters.Except(mceSqlParameters, new SqlParameterParameterNameAndValueEqualityComparer()).Any();
         }
 
         private class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter> {
-            public override bool Equals(SqlParameter x, SqlParameter y)
-            {
-                var parameterNameIsEqual =
-                    x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase);
+            public override bool Equals(SqlParameter x, SqlParameter y) {
+                var parameterNamesAreEqual = false;
+                if (x.ParameterName == null && y.ParameterName == null)
+                    parameterNamesAreEqual = true;
+                else if (x.ParameterName != null || y.ParameterName != null)
+                    parameterNamesAreEqual = x.ParameterName.Equals(y.ParameterName, StringComparison.CurrentCultureIgnoreCase);
 
-                var valueIsEqual = false;
+                var valuesAreEqual = false;
                 if (x.Value == null && y.Value == null)
-                    valueIsEqual = true;
-                else if (x.Value != null && y.Value == null || x.Value == null && y.Value != null)
-                    valueIsEqual = false;
-                else
-                    valueIsEqual = x.Value.ToString()
-                        .Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
+                    valuesAreEqual = true;
+                else if (x.Value != null || y.Value != null)
+                    valuesAreEqual = x.Value.ToString().Equals(y.Value.ToString(), StringComparison.CurrentCultureIgnoreCase);
 
-                return parameterNameIsEqual && valueIsEqual;
+                return parameterNamesAreEqual && valuesAreEqual;
             }
 
-            public override int GetHashCode(SqlParameter obj)
-            {
+            public override int GetHashCode(SqlParameter obj) {
                 var hashCode = obj.ParameterName.ToLower().GetHashCode();
-                if(obj.Value != null)
+                if (obj.Value != null)
                     hashCode += obj.Value.ToString().ToLower().GetHashCode();
                 return hashCode;
             }
