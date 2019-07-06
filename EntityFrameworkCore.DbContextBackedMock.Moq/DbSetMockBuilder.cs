@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// </summary>
     /// <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
     /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
-    public class DbSetMockBuilder<TDbContext, TEntity> : MockBuilderBase<TDbContext>
+    public class DbSetMockBuilder<TDbContext, TEntity> : DbContextMockBuilder<TDbContext>
         where TDbContext : DbContext
         where TEntity : class {
 
