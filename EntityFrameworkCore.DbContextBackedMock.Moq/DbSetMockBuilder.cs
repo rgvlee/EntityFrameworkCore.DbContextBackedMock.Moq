@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// </summary>
     /// <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
     /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
-    public class DbSetMockBuilder<TDbContext, TEntity> : DbContextMockBuilder<TDbContext>
+    public class DbSetMockBuilder<TDbContext, TEntity> : MockBuilderBase<TDbContext>
         where TDbContext : DbContext
         where TEntity : class {
 
@@ -29,14 +28,10 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="dbContextToMock">The DbContext to mock.</param>
-        /// <param name="dbContextMock">The DbContext mock.</param>
-        internal DbSetMockBuilder(TDbContext dbContextToMock, Mock<TDbContext> dbContextMock) {
-            DbContextToMock = dbContextToMock;
-            DbContextMock = dbContextMock;
-
-            //DbSetToMock = DbContextToMock.Set<TEntity>();
-            DbSetToMock =(DbSet<TEntity>)((IDbSetCache) dbContextToMock).GetOrAddSet(((IDbContextDependencies) dbContextToMock).SetSource, typeof(TEntity));
+        /// <param name="mockBuilderBase">The mock builder base.</param>
+        internal DbSetMockBuilder(MockBuilderBase<TDbContext> mockBuilderBase) : base (mockBuilderBase) {
+            DbSetToMock = DbContextToMock.Set<TEntity>();
+            //DbSetToMock =(DbSet<TEntity>)((IDbSetCache) dbContextToMock).GetOrAddSet(((IDbContextDependencies) dbContextToMock).SetSource, typeof(TEntity));
             DbSetMock = DbSetToMock.CreateDbSetMock();
             
             DbContextMock.Setup(m => m.Add(It.IsAny<TEntity>())).Returns((TEntity entity) => DbContextToMock.Add(entity));

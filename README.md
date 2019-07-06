@@ -29,21 +29,40 @@ Operations on the mock DbContext are funnelled through to the in memory DbContex
 ```
 [Test]
 public void Add_NewEntity_Persists() {
-    var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpDbSetFor<TestEntity1>();
+    var builder = new DbContextMockBuilder<TestContext>();
     var mockContext = builder.GetDbContextMock();
+    var context = mockContext.Object;
 
+    var testEntity1 = new TestEntity1();
+    Assert.AreEqual(default(Guid), testEntity1.Id);
+    context.Set<TestEntity1>().Add(testEntity1);
+    context.SaveChanges();
+
+    Assert.AreNotEqual(default(Guid), testEntity1.Id);
+    Assert.AreEqual(testEntity1, context.Find<TestEntity1>(testEntity1.Id));
+    mockContext.Verify(m => m.SaveChanges(), Times.Once);
+}
+```
+
+Or if you want to provide your own DbContext and only set up a specified DbSet:
+
+```
+[Test]
+public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
+    var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false).AddSetUpDbSetFor<TestEntity1>();
+    var mockContext = builder.GetDbContextMock();
+            
     var context = mockContext.Object;
     var testEntity1 = new TestEntity1();
     Assert.AreEqual(default(Guid), testEntity1.Id);
 
     context.Set<TestEntity1>().Add(testEntity1);
     context.SaveChanges();
-    Assert.AreNotEqual(default(Guid), testEntity1.Id);
 
+    Assert.AreNotEqual(default(Guid), testEntity1.Id);
     Assert.AreEqual(testEntity1, contextToMock.Find<TestEntity1>(testEntity1.Id));
     Assert.AreEqual(testEntity1, context.Find<TestEntity1>(testEntity1.Id));
-
     mockContext.Verify(m => m.SaveChanges(), Times.Once);
 }
 ```

@@ -58,11 +58,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             dbContextMock.As<IDbContextDependencies>().Setup(m => m.InfrastructureLogger).Returns(((IDbContextDependencies)dbContextToMock).InfrastructureLogger);
             dbContextMock.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance).Returns(((IInfrastructure<IServiceProvider>)dbContextToMock).Instance);
             dbContextMock.As<IDbContextDependencies>().Setup(m => m.Model).Returns(((IDbContextDependencies)dbContextToMock).Model);
-
-            //public DbQuery<TQuery> Query<TQuery>() where TQuery : class {
-            //    return DbContextToMock.Query<TQuery>();
-            //}
-
             dbContextMock.As<IDbContextDependencies>().Setup(m => m.QueryProvider).Returns(((IDbContextDependencies)dbContextToMock).QueryProvider);
             dbContextMock.As<IDbContextDependencies>().Setup(m => m.QuerySource).Returns(((IDbContextDependencies)dbContextToMock).QuerySource);
             dbContextMock.Setup(m => m.Remove(It.IsAny<object>())).Returns((object entity) => dbContextToMock.Remove(entity));

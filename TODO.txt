@@ -1,7 +1,5 @@
 # TODO
 
-- Add the rest of the DbContext and DbSet interface to mock set ups (async etc)
-- Mock the DbContext DbSet properties (e.g., TestContext.TestEntities.Select(x => ...), if possible to do in a generic manner)
-- Automatically mock all DbSet properties (again if possible, may be difficult given Set<T> is strongly typed and there is no Set(Type) method
+- Add the query mock set up for the db context
 - Update existing tests in line with best practice (method names, scope etc)
 - Add tests for untested functionality

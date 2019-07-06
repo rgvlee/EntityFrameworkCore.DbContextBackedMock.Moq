@@ -236,5 +236,31 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             dbContext.SaveChanges();
             Assert.IsTrue(dbContext.Set<TestEntity1>().Any());
         }
+
+        [Test]
+        public void Get_UsingAutoSetUp_ReturnsExpectedResult() {
+            var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpForAllDbSets();
+
+            var mockContext = builder.GetDbContextMock();
+            var mockedContext = mockContext.Object;
+
+            var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+            mockedContext.Set<TestEntity1>().AddRange(list1);
+            mockedContext.SaveChanges();
+            Assert.IsTrue(mockedContext.Set<TestEntity1>().Any());
+            Assert.IsTrue(mockedContext.TestEntities.Any());
+
+            CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
+
+            var repository = new TestRepository<TestContext, TestEntity1>(mockedContext);
+
+            var result1 = repository.GetAll().ToList();
+
+            Assert.IsNotNull(result1);
+            Assert.IsTrue(result1.Any());
+            CollectionAssert.AreEquivalent(result1, list1);
+            
+        }
     }
 }
