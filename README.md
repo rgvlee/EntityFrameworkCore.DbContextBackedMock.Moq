@@ -67,6 +67,27 @@ public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
 }
 ```
 
+The mock set up covers both Set<TEntity> and the DbContext DbSet<TEntity> property:
+
+```
+[Test]
+public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
+    var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpForAllDbSets();
+
+    var mockContext = builder.GetDbContextMock();
+    var mockedContext = mockContext.Object;
+
+    var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+    mockedContext.Set<TestEntity1>().AddRange(list1);
+    mockedContext.SaveChanges();
+
+    Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
+    Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
+    CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
+}
+```
+
 ### Testing FromSql
 
 The main difference here is that we need the seed data to set up query provider to return the expected result.
