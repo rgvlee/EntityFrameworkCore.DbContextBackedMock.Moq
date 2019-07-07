@@ -143,7 +143,7 @@ Expanding on the previous example, for this test we create a mock query provider
 - A sequence of FromSql SqlParameters
 
 The FromSql __sql__ set up matching is case insensitive and supports partial matches; in the example we're able to match on just the stored procedure name. The FromSql __SqlParameters__, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive however it does not support partial matches on the parameter name/value.
-Only FromSql SqlParameters provided to the query provider mock will be checked. All others will be ignored so you only need to specify the bare minimum for a mock setup match.
+Only FromSql SqlParameters provided to the query provider mock will be checked. All others will be ignored so you only need to specify the bare minimum for a mock set up match.
 ```
 [Test]
 public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult() {
