@@ -55,7 +55,7 @@ Or if you want to provide your own DbContext and only set up a specified DbSet:
 - Create the context to mock
 - Create the builder providing the constructor parameters:
 	- The context to mock you've just created
-	- addSetUpForAllDbSets = false
+	- addSetUpForAllSets = false
 - Set up the DbSet you want to mock
 - Consume
 
