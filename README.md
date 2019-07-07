@@ -1,6 +1,6 @@
 
 # EntityFrameworkCore.DbContextBackedMock.Moq
-__*The FromSql EntityFrameworkCore mocking library*__
+__*The EntityFrameworkCore FromSql mocking library*__
 
 EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. It's basically a delegate pattern implementation where the mock for the most part is delegating over the top of the DbContext.
 
