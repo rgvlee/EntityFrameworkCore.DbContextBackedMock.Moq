@@ -41,7 +41,7 @@ __Note: automatic DbContext creation requires a DbContext constructor with a sin
 public void Add_NewEntity_Persists() {
     var builder = new DbContextMockBuilder<TestContext>();
     var mockContext = builder.GetDbContextMock();
-    var mockedContext = mockContext.Object;
+    var mockedContext = builder.GetMockedDbContext();
     var testEntity1 = new TestEntity1();
 
     mockedContext.Set<TestEntity1>().Add(testEntity1);
@@ -49,8 +49,7 @@ public void Add_NewEntity_Persists() {
 
     Assert.Multiple(() => {
         Assert.AreNotEqual(default(Guid), testEntity1.Id);
-        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
-        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
+        Assert.DoesNotThrow(() => mockedContext.Set<TestEntity1>().Single());
         Assert.AreEqual(testEntity1, mockedContext.Find<TestEntity1>(testEntity1.Id));
         mockContext.Verify(m => m.SaveChanges(), Times.Once);
     });
@@ -63,49 +62,23 @@ Or if you want to provide your own DbContext and only set up a specified DbSet:
 	- addSetUpForAllDbSets = false
 - Set up the DbSet you want to mock
 - Consume
+
+The mock set up covers both the Set<TEntity> and DbContext DbSet<TEntity> property:
+
 ```
 [Test]
-public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
+public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false).AddSetUpDbSetFor<TestEntity1>();
-    var mockContext = builder.GetDbContextMock();
-    var mockedContext = mockContext.Object;
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false);
+    builder.AddSetUpDbSetFor<TestEntity1>();
+    var mockedContext = builder.GetMockedDbContext();
     var testEntity1 = new TestEntity1();
             
     mockedContext.Set<TestEntity1>().Add(testEntity1);
     mockedContext.SaveChanges();
 
     Assert.Multiple(() => {
-        Assert.AreNotEqual(default(Guid), testEntity1.Id);
-
-        Assert.IsTrue(contextToMock.Set<TestEntity1>().Any()); //DbSet
-        Assert.IsTrue(contextToMock.TestEntities.Any()); //DbContext DbSet<TEntity> property
-        Assert.AreEqual(testEntity1, contextToMock.Find<TestEntity1>(testEntity1.Id));
-
-        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
-        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
-        Assert.AreEqual(testEntity1, mockedContext.Find<TestEntity1>(testEntity1.Id));
-
-        mockContext.Verify(m => m.SaveChanges(), Times.Once);
-    });
-}
-```
-The mock set up covers both Set<TEntity> and the DbContext DbSet<TEntity> property:
-```
-[Test]
-public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
-    var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpForAllDbSets();
-    var mockContext = builder.GetDbContextMock();
-    var mockedContext = mockContext.Object;
-    var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
-
-    mockedContext.Set<TestEntity1>().AddRange(list1);
-    mockedContext.SaveChanges();
-
-    Assert.Multiple(() => {
-        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
-        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet property
+        Assert.DoesNotThrow(() => mockedContext.Set<TestEntity1>().Single());
         CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
     });
 }

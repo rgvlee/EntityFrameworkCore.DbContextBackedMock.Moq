@@ -61,7 +61,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         [Test]
         public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-            var builder = new DbContextMockBuilder<TestContext>(contextToMock, false).AddSetUpDbSetFor<TestEntity1>();
+            var builder = new DbContextMockBuilder<TestContext>(contextToMock, false);
+            builder.AddSetUpDbSetFor<TestEntity1>();
             var mockedContext = builder.GetMockedDbContext();
             var testEntity1 = new TestEntity1();
             
