@@ -207,6 +207,12 @@
             </summary>
             <returns>The DbContext mock.</returns>
         </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.MockBuilderBase`1.GetMockedDbContext">
+            <summary>
+            Gets the set up mocked DbContext.
+            </summary>
+            <returns>The mocked DbContext.</returns>
+        </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.MockBuilderBase`1.GetDbSetMockFor``1">
             <summary>
             Gets the set up DbSet mock for the specified entity.

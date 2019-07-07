@@ -131,6 +131,14 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         }
 
         /// <summary>
+        /// Gets the set up mocked DbContext.
+        /// </summary>
+        /// <returns>The mocked DbContext.</returns>
+        public TDbContext GetMockedDbContext() {
+            return DbContextMock.Object;
+        }
+
+        /// <summary>
         /// Gets the set up DbSet mock for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
