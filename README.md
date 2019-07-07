@@ -2,11 +2,11 @@
 # EntityFrameworkCore.DbContextBackedMock.Moq
 __*The EntityFrameworkCore FromSql mocking library*__
 
-EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. It's basically a delegation pattern implementation where the mock for the most part is delegating over the top of the DbContext.
+EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. It's basically a delegation pattern implementation where the mock for the most part is delegating to a DbContext.
 
 If it's just a wrapper, why bother using it? There's a couple of reasons.
 
-It's designed to work with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
+It's __designed to work with the Microsoft InMemory provider__ (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
 often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation). 
 
 If you're using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, this library will do the heavy lifting for you.
