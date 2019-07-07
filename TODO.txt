@@ -1,5 +1,6 @@
 # TODO
 
-- Add the query mock set up for the db context
+- Add mock set up for DbContext.DbQuery
+- Add mock set up for DbContext.Database.ExecuteSqlCommand()
 - Update existing tests in line with best practice (method names, scope etc)
 - Add tests for untested functionality

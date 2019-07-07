@@ -1,30 +1,39 @@
-# EntityFrameworkCore.DbContextBackedMock.Moq
 
-EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext (and mock DbSets) and have it 
-backed by an actual DbContext. It's basically a delegate pattern implementation where the mock for the most part
-is delegating over the top of the DbContext.
+# EntityFrameworkCore.DbContextBackedMock.Moq
+__*The FromSql EntityFrameworkCore mocking library*__
+
+EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext (and mock DbSets) and have it backed by an actual DbContext. It's basically a delegate pattern implementation where the mock for the most part is delegating over the top of the DbContext.
 
 If it's just a wrapper, why bother using it? There's a couple of reasons.
 
 It's designed to work with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
-often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where
-this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included
-in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation). 
+often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation). 
 
-If your using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, 
-this library will do the heavy lifting for you.
+If you're using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, this library will do the heavy lifting for you.
 
-Consumption is via a builder. Create the builder, tell it what DbSets to mock, add any FromSql mocks and off you go.
+Consumption is via a builder.
+
+## Download
+NuGet: [https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
+## Fluent interface
+The builder provides a fluent interface for both DbContext and DbSet mocks. I've designed the API to be intuitive and discoverable. The examples below do touch on a bit of the available functionality.
+There are actually 2 builders, 1 for the DbContext and 1 for DbSets. Once you invoke a DbSet method you'll get the DbSet builder. This is deliberate as it provides explicit entity DbSet set up scoping.
+
+## The disclaimer
+The library sets up a lot of the DbContext functionality but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked flick me a message and I'll see what I can do.
+
+### TODO
+- Add mock set up for DbContext.DbQuery
+- Add mock set up for DbContext.Database.ExecuteSqlCommand()
 
 ## Example Usage
-
-- Create an in memory DbContext
 - Create the builder
-- Setup the mock DbSet
 - Get the db context mock
 - Consume
 
-Operations on the mock DbContext are funnelled through to the in memory DbContext. You can add/update/remove on either and both will yield the same result.
+Operations on the mock DbContext are funneled through to the in memory DbContext. You can add/update/remove on either and both will yield the same result. In this example an in-memory DbContext is automatically created for us and all of the DbContext DbSets have been mocked automatically for us.
+
+__Note: automatic DbContext creation requires a DbContext constructor with a single DbContextOptions parameter__.
 
 ```
 [Test]
@@ -43,14 +52,19 @@ public void Add_NewEntity_Persists() {
     mockContext.Verify(m => m.SaveChanges(), Times.Once);
 }
 ```
-
 Or if you want to provide your own DbContext and only set up a specified DbSet:
-
+- Create the context to mock
+- Create the builder providing the constructor parameters:
+	- The context to mock you've just created
+	- addSetUpForAllDbSets = false
+- Set up the DbSet you want to mock
+- Consume
 ```
 [Test]
 public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false).AddSetUpDbSetFor<TestEntity1>();
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false)
+	builder.AddSetUpDbSetFor<TestEntity1>();
     var mockContext = builder.GetDbContextMock();
             
     var context = mockContext.Object;
@@ -66,9 +80,7 @@ public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
     mockContext.Verify(m => m.SaveChanges(), Times.Once);
 }
 ```
-
 The mock set up covers both Set<TEntity> and the DbContext DbSet<TEntity> property:
-
 ```
 [Test]
 public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
@@ -87,14 +99,11 @@ public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
     CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
 }
 ```
-
 ### Testing FromSql
-
 The main difference here is that we need the seed data to set up query provider to return the expected result.
 Create in memory DbContext/mock DbContext/generate seed data/create and set up/invoke FromSql.
 In this case we didn't need to persist the seed data; it will depend on implementation of your FromSql usage (e.g., if FromSql is invoked with a repository 
 and the operation invokes other DbContext/DbSet operations you may need to persist the seed data).
-
 ```
 [Test]
 public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
@@ -116,17 +125,13 @@ public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
     CollectionAssert.AreEquivalent(list1, result);
 }
 ```
-
 ### Testing FromSql with SqlParameters
-
 Expanding on the previous example, for this test we create a mock query provider and specify 
 - The FromSql sql that we want to match;
 - A sequence of FromSql SqlParameters
 
-The FromSql sql set up is based on a case insensitive contains; in the example we're able to match on just the stored procedure name.
-The FromSql SqlParameters, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive as demonstrated below.
+The FromSql sql set up is based on a case insensitive contains; in the example we're able to match on just the stored procedure name. The FromSql SqlParameters, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive as demonstrated below.
 Only FromSql SqlParameters provided to the query provider mock will be checked. All others will be ignored so you only need to specify the bare minimum for a mock setup match.
-
 ```
 [Test]
 public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult() {
@@ -151,12 +156,3 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
     CollectionAssert.AreEquivalent(list1, result);
 }
 ```
-
-## Fluent interface
-
-The builder provides a fluent interface for both DbContext and DbSet mocks. I've designed the API to be intuitive and discoverable. The examples above do touch on a bit of the available functionality.
-There are actually 2 builders, 1 for the DbContext and one for DbSets. Once you invoke a DbSet method you'll get the DbSet builder. This is deliberate as it provides explicit entity DbSet set up scoping.
-
-## The disclaimer
-
-The library sets up a lot of the DbContext functionality but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked flick me a message and I'll see what I can do.
