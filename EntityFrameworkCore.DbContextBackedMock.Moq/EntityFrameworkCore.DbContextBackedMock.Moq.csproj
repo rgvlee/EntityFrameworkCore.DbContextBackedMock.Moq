@@ -28,6 +28,11 @@ Designed to work in conjuction with the Microsoft InMemory provider (https://doc
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DbSetMockBuilder.cs" />
+    <Compile Remove="QueryableMockBuilderBase.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
     <PackageReference Include="Moq" Version="4.12.0" />

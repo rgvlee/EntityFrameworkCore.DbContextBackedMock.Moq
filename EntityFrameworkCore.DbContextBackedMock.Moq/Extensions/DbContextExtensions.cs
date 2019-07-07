@@ -1,30 +1,16 @@
-using System;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// <summary>
-    /// Extensions for DbContexts
+    /// Extensions for db contexts.
     /// </summary>
     public static class DbContextExtensions {
-        /// <summary>
-        /// Gets the property info of all of the DbSet properties for the specified DbContext.
-        /// </summary>
-        /// <param name="dbContext"></param>
-        /// <returns>The property info of all of the DbSet properties for the specified DbContext.</returns>
-        public static IEnumerable<PropertyInfo> GetPropertyInfoForAllDbSets(this DbContext dbContext) {
-            var properties = dbContext.GetType().GetProperties().Where(p =>
-                p.PropertyType.IsGenericType && //must be a generic type for the next part of the predicate
-                typeof(DbSet<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()));
-            return properties;
-        }
-
         /// <summary>
         /// Creates a DbContext mock that delegates over the specified DbContext.
         /// </summary>

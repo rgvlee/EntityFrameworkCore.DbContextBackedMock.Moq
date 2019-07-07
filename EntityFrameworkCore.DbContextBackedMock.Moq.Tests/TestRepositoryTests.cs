@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -13,7 +14,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         public void GetUsingStoredProcedureWithNoParametersSql_WithMatchingFromSql_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-            builder.AddSetUpDbSetFor<TestEntity1>();
             var mockContext = builder.GetDbContextMock();
 
             var context = mockContext.Object;
@@ -34,7 +34,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                     new SqlParameter("@SomeParameter2", "SomeParameter2Value")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddDbSetQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithNoParameters().ToList();
 
@@ -48,7 +48,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         public void GetUsingStoredProcedureWithParametersSql_WithMatchingFromSql_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-            builder.AddSetUpDbSetFor<TestEntity1>();
             var mockContext = builder.GetDbContextMock();
 
             var context = mockContext.Object;
@@ -69,7 +68,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                     new SqlParameter("@SomeParameter2", "Value2")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddDbSetQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
 
@@ -83,7 +82,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         public void GetUsingStoredProcedureWithParametersSql_WithDifferentFromSql_ReturnsEmptyResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-            builder.AddSetUpDbSetFor<TestEntity1>();
             var mockContext = builder.GetDbContextMock();
 
             var context = mockContext.Object;
@@ -104,7 +102,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 new SqlParameter("@SomeParameter2", "1234")
             };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddDbSetQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
 
@@ -116,7 +114,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         public void Get_UsingManualSetUp_ReturnsExpectedResult() {
             var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
             var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-            builder.AddSetUpDbSetFor<TestEntity1>();
             var mockContext = builder.GetDbContextMock();
 
             var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };

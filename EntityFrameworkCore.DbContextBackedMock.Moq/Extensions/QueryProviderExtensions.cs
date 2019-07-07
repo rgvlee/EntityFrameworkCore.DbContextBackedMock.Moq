@@ -1,23 +1,23 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-using Microsoft.EntityFrameworkCore;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// <summary>
     /// Extensions for query provider mocks.
     /// </summary>
     public static class QueryProviderExtensions {
         /// <summary>
-        /// Sets up DbSet FromSql invocations to return a specified sequence.
+        /// Sets up FromSql invocations to return a specified sequence.
         /// </summary>
-        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
         /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
         /// <returns>The query provider mock.</returns>
@@ -29,9 +29,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         }
 
         /// <summary>
-        /// Sets up DbSet FromSql invocations for containing a specified sql string to return a specified sequence. 
+        /// Sets up FromSql invocations containing a specified sql string to return a specified sequence. 
         /// </summary>
-        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
         /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
         /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
@@ -59,9 +59,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         }
 
         /// <summary>
-        /// Sets up DbSet FromSql invocations for containing a specified sql string to return a specified sequence. 
+        /// Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified sequence. 
         /// </summary>
-        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
         /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
         /// <param name="sqlParameters">The FromSql sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
@@ -175,7 +175,10 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             foreach (var sqlParameter in sqlParameters) {
                 sb.Append(sqlParameter.ParameterName);
                 sb.Append(": ");
-                sb.AppendLine(sqlParameter.Value == null ? "null" : sqlParameter.Value.ToString());
+                if (sqlParameter.Value == null)
+                    sb.AppendLine("null");
+                else
+                    sb.AppendLine(sqlParameter.Value.ToString());
             }
 
             return sb.ToString();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// <summary>
     /// Extensions for strings.
     /// </summary>

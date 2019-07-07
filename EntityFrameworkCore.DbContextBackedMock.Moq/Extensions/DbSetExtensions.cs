@@ -1,17 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Moq;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using Moq;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// <summary>
-    /// Extensions for DbSets.
+    /// Extensions for db sets.
     /// </summary>
     public static class DbSetExtensions {
         /// <summary>
@@ -61,12 +61,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
              */
             dbSetMock.As<IListSource>().Setup(m => m.GetList()).Returns(dbSet.ToList());
 
-            dbSetMock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(((IQueryable<TEntity>)dbSet).Provider);
-            
             dbSetMock.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance).Returns(((IInfrastructure<IServiceProvider>)dbSet).Instance);
             
             dbSetMock.Setup(m => m.Local).Returns(dbSet.Local);
-            
+
+            dbSetMock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(((IQueryable<TEntity>)dbSet).Provider);
+
             dbSetMock.Setup(m => m.Remove(It.IsAny<TEntity>())).Returns((TEntity entity) => dbSet.Remove(entity));
             dbSetMock.Setup(m => m.RemoveRange(It.IsAny<IEnumerable<TEntity>>())).Callback((IEnumerable<TEntity> entities) => dbSet.RemoveRange(entities));
             dbSetMock.Setup(m => m.RemoveRange(It.IsAny<TEntity[]>())).Callback((TEntity[] entities) => dbSet.RemoveRange(entities));
@@ -75,33 +75,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             dbSetMock.Setup(m => m.UpdateRange(It.IsAny<IEnumerable<TEntity>>())).Callback((IEnumerable<TEntity> entities) => dbSet.UpdateRange(entities));
             dbSetMock.Setup(m => m.UpdateRange(It.IsAny<TEntity[]>())).Callback((TEntity[] entities) => dbSet.UpdateRange(entities));
 
-            return dbSetMock;
-        }
-
-        /// <summary>
-        /// Adds the mock set up for the specified query provider mock to the specified DbSet mock.
-        /// </summary>
-        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
-        /// <param name="dbSetMock">The DbSet mock to add the additional set up to.</param>
-        /// <param name="queryProviderMock">The query provider mock.</param>
-        /// <returns>The DbSet mock.</returns>
-        public static Mock<DbSet<TEntity>> AddSetUpForProvider<TEntity>(this Mock<DbSet<TEntity>> dbSetMock, Mock<IQueryProvider> queryProviderMock)
-            where TEntity : class {
-            dbSetMock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
-            return dbSetMock;
-        }
-
-        /// <summary>
-        /// Adds the mock set up for the FromSql method the specified DbSet mock.
-        /// </summary>
-        /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
-        /// <param name="dbSetMock">The DbSet mock to add the additional set up to.</param>
-        /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
-        /// <returns>The DbSet mock.</returns>
-        public static Mock<DbSet<TEntity>> AddSetUpForMockFromSql<TEntity>(this Mock<DbSet<TEntity>> dbSetMock, IEnumerable<TEntity> expectedFromSqlResult) where TEntity : class {
-            var mockQueryProvider = new Mock<IQueryProvider>();
-            mockQueryProvider.SetUpFromSql(expectedFromSqlResult);
-            dbSetMock.AddSetUpForProvider(mockQueryProvider);
             return dbSetMock;
         }
     }
