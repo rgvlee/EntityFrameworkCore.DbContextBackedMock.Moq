@@ -1,4 +1,5 @@
 
+
 # EntityFrameworkCore.DbContextBackedMock.Moq
 __*The EntityFrameworkCore FromSql mocking library*__
 
@@ -31,7 +32,7 @@ The library sets up a lot of the DbContext functionality but not all of it. I ha
 - Get the db context mock
 - Consume
 
-Operations on the mock DbContext are funneled through to the in memory DbContext. You can add/update/remove on either and both will yield the same result. In this example an in-memory DbContext is automatically created for us and all of the DbContext DbSets have been mocked automatically for us.
+In this example the builder automatically creates an in-memory context and sets up the mock set ups for all of the DbContext DbSets. Operations on the mock DbContext are funneled through to the in memory DbContext. You can add/update/remove on either and both will yield the same result.
 
 __Note: automatic DbContext creation requires a DbContext constructor with a single DbContextOptions parameter__.
 
