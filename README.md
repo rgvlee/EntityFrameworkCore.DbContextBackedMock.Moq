@@ -1,5 +1,3 @@
-
-
 # EntityFrameworkCore.DbContextBackedMock.Moq
 __*The EntityFrameworkCore FromSql mocking library*__
 
@@ -17,14 +15,12 @@ Consumption is via a builder.
 ## Download
 NuGet: [https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
 ## Fluent interface
-The builder provides a fluent interface for both DbContext and DbSet mocks. I've designed the API to be intuitive and discoverable. The examples below do touch on a bit of the available functionality.
-There are actually 2 builders, 1 for the DbContext and 1 for DbSets. Once you invoke a DbSet method you'll get the DbSet builder. This is deliberate as it provides explicit entity DbSet set up scoping.
+The builder provides a fluent interface for building the DbContext, DbSet, and DbQuery mocks. I've designed the API to be intuitive and discoverable. The examples below touch on a bit of the available functionality.
 
 ## The disclaimer
 The library sets up a lot of the DbContext functionality but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked flick me a message and I'll see what I can do.
 
 ### TODO
-- Add mock set up for DbContext.DbQuery
 - Add mock set up for DbContext.Database.ExecuteSqlCommand()
 
 ## Example Usage
@@ -70,10 +66,10 @@ The mock set up covers both the Set<TEntity> and DbContext DbSet<TEntity> proper
 public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
     var builder = new DbContextMockBuilder<TestContext>(contextToMock, false);
-    builder.AddSetUpDbSetFor<TestEntity1>();
+    builder.AddSetUpFor(x => x.TestEntities);
     var mockedContext = builder.GetMockedDbContext();
     var testEntity1 = new TestEntity1();
-            
+
     mockedContext.Set<TestEntity1>().Add(testEntity1);
     mockedContext.SaveChanges();
 
@@ -92,15 +88,15 @@ In this case we didn't need to persist the seed data, whether you do or not will
 public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
     var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-            
+
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
 
-    builder.AddSetUpDbSetFor<TestEntity1>().WithFromSqlResult(list1.AsQueryable());
+    builder.AddSetUpFor(x => x.TestEntities).AddFromSqlResultFor<TestEntity1>(list1.AsQueryable());
 
     var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-            
+
     var result = context.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
 
     Assert.Multiple(() => {
@@ -111,7 +107,7 @@ public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
 }
 ```
 ### Testing FromSql with SqlParameters
-Expanding on the previous example, for this test we create a mock query provider and specify 
+Expanding on the previous example, for this test we create a mock query provider and specify:
 - The FromSql sql that we want to match;
 - A sequence of FromSql SqlParameters
 
@@ -125,16 +121,52 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
-            
+
     var mockQueryProvider = new Mock<IQueryProvider>();
     var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
-    builder.AddSetUpDbSetFor<TestEntity1>().WithQueryProviderMock(mockQueryProvider);
+    builder.AddSetUpFor(x => x.TestEntities).AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
 
     var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-            
+
     var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
+
+    Assert.Multiple(() => {
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Any());
+        CollectionAssert.AreEquivalent(list1, result);
+    });
+}
+```
+### What about Queries?
+Haven't forgotten about them. Queries can't really be set up automatically as to be useful you need to seed them. Not a big hassle though, set up is easy.
+```
+[Test]
+public void SetUpQuery_Enumeration_ReturnsEnumeration() {
+    var list1 = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+    var builder = new DbContextMockBuilder<TestContext>();
+    builder.AddSetUpFor(x => x.TestView, list1);
+    var mockedContext = builder.GetMockedDbContext();
+            
+    Assert.Multiple(() => {
+        CollectionAssert.AreEquivalent(list1, mockedContext.Query<TestEntity2>().ToList());
+        CollectionAssert.AreEquivalent(mockedContext.Query<TestEntity2>().ToList(), mockedContext.TestView.ToList());
+    });
+}
+```
+The FromSql mocking works the same as with the sets.
+```
+[Test]
+public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
+    var list1 = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+    var builder = new DbContextMockBuilder<TestContext>();
+    builder.AddSetUpFor(x => x.TestView, list1).AddFromSqlResultFor(list1);
+    var context = builder.GetMockedDbContext();
+            
+    var result = context.Query<TestEntity2>().FromSql("sp_NoParams").ToList();
 
     Assert.Multiple(() => {
         Assert.IsNotNull(result);

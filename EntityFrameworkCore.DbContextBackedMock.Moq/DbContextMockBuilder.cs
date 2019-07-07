@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
+﻿using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
+using EntityFrameworkCore.DbContextBackedMock.Moq.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// <summary>
@@ -27,24 +29,21 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// Constructor.
         /// </summary>
         /// <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
-        /// <param name="addSetUpForAllQueries">If set to true all of the DbContext queries will be set up automatically.</param>
         /// <remarks>Automatically creates a new in-memory database that will be used to back the DbContext mock.
         /// Requires the <see>
         ///     <cref>TDbContext</cref>
         /// </see>
         /// type to have a DbContextOptions constructor.</remarks>
-        public DbContextMockBuilder(bool addSetUpForAllSets = true, bool addSetUpForAllQueries = true) :
+        public DbContextMockBuilder(bool addSetUpForAllSets = true) :
             this((TDbContext)Activator.CreateInstance(typeof(TDbContext), new DbContextOptionsBuilder<TDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options), 
-                addSetUpForAllSets, 
-                addSetUpForAllQueries) { }
+                addSetUpForAllSets) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="dbContextToMock">The DbContext to mock.</param>
         /// <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
-        /// <param name="addSetUpForAllQueries">If set to true all of the DbContext queries will be set up automatically.</param>
-        public DbContextMockBuilder(TDbContext dbContextToMock, bool addSetUpForAllSets = true, bool addSetUpForAllQueries = true) {
+        public DbContextMockBuilder(TDbContext dbContextToMock, bool addSetUpForAllSets = true) {
             _mockCache = new Dictionary<Type, object>();
 
             _dbContextToMock = dbContextToMock;
@@ -57,12 +56,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             _dbContextMock = _dbContextToMock.CreateDbContextMock();
 
             if (addSetUpForAllSets) AddSetUpForAllSets();
-            if (addSetUpForAllQueries) AddSetUpForAllQueries();
         }
-        
+
         private object GetOrCreateMockFor<TEntity>() where TEntity : class {
             if (!_mockCache.ContainsKey(typeof(TEntity))) {
-                AddSetUpFor<TEntity>();
+                var propertyInfo = _dbContextProperties.Single(q => q.PropertyType == typeof(DbSet<TEntity>));
+                AddSetUpFor(ExpressionHelper.CreatePropertyExpression<TDbContext, DbSet<TEntity>>(propertyInfo));
             }
             return _mockCache[typeof(TEntity)];
         }
@@ -77,7 +76,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
                 // ReSharper disable PossibleNullReferenceException
                 // ReSharper disable UnusedVariable
                 // ReSharper disable ArrangeThisQualifier
-                var builder = this.GetType().GetMethod(nameof(AddSetUpFor)).MakeGenericMethod(entityType).Invoke(this, null);
+                var expression = typeof(ExpressionHelper).GetMethods().Single(m => m.Name.Equals(nameof(ExpressionHelper.CreatePropertyExpression)) && m.GetParameters().ToList().Count == 1).MakeGenericMethod(typeof(TDbContext), propertyInfo.PropertyType).Invoke(this, new []{ propertyInfo });
+                var builder = this.GetType().GetMethods().Single(m => m.Name.Equals(nameof(AddSetUpFor)) && m.GetParameters().ToList().Count == 1).MakeGenericMethod(entityType).Invoke(this, new []{ expression });
                 // ReSharper restore ArrangeThisQualifier
                 // ReSharper restore UnusedVariable
                 // ReSharper restore PossibleNullReferenceException
@@ -85,32 +85,13 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
 
             return this;
         }
-
-        /// <summary>
-        /// Creates mocks for all of the DbContext queries.
-        /// </summary>
-        /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddSetUpForAllQueries() {
-            foreach (var propertyInfo in _dbContextProperties.Where(q => typeof(DbQuery<>).IsAssignableFrom(q.PropertyType.GetGenericTypeDefinition()))) {
-                var entityType = propertyInfo.PropertyType.GenericTypeArguments.First();
-                // ReSharper disable PossibleNullReferenceException
-                // ReSharper disable UnusedVariable
-                // ReSharper disable ArrangeThisQualifier
-                var builder = this.GetType().GetMethod(nameof(AddSetUpFor)).MakeGenericMethod(entityType).Invoke(this, null);
-                // ReSharper restore ArrangeThisQualifier
-                // ReSharper restore UnusedVariable
-                // ReSharper restore PossibleNullReferenceException
-            }
-
-            return this;
-        }
-
+        
         /// <summary>
         /// Adds the mock set up for an entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddSetUpFor<TEntity>() where TEntity : class{
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class{
             foreach (var propertyInfo in _dbContextProperties.Where(q => typeof(DbSet<>).IsAssignableFrom(q.PropertyType.GetGenericTypeDefinition()))) {
                 var entityType = propertyInfo.PropertyType.GenericTypeArguments.First();
                 if (entityType != typeof(TEntity)) continue;
@@ -131,27 +112,38 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
                 _dbContextMock.Setup(m => m.FindAsync<TEntity>(It.IsAny<object[]>())).Returns((object[] keyValues) => _dbContextToMock.FindAsync<TEntity>(keyValues));
                 _dbContextMock.Setup(m => m.FindAsync<TEntity>(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).Returns((object[] keyValues, CancellationToken cancellationToken) => _dbContextToMock.FindAsync<TEntity>(keyValues, cancellationToken));
                 _dbContextMock.Setup(m => m.Remove(It.IsAny<TEntity>())).Returns((TEntity entity) => _dbContextToMock.Remove(entity));
+                _dbContextMock.Setup(expression).Returns(() => dbSetMock.Object);
                 _dbContextMock.Setup(m => m.Set<TEntity>()).Returns(() => dbSetMock.Object);
                 _dbContextMock.Setup(m => m.Update(It.IsAny<TEntity>())).Returns((TEntity entity) => _dbContextToMock.Update(entity));
                 
                 return this;
             }
 
+            throw new ArgumentException($"Unable to create a db set mock for {nameof(TEntity)} as it is not a defined as a set for the DbContext.");
+        }
+
+        /// <summary>
+        /// Adds the mock set up for a query.
+        /// </summary>
+        /// <typeparam name="TQuery">The query type.</typeparam>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, IEnumerable<TQuery> rows) where TQuery : class {
             foreach (var propertyInfo in _dbContextProperties.Where(q => typeof(DbQuery<>).IsAssignableFrom(q.PropertyType.GetGenericTypeDefinition()))) {
                 var entityType = propertyInfo.PropertyType.GenericTypeArguments.First();
-                if (entityType != typeof(TEntity)) continue;
+                if (entityType != typeof(TQuery)) continue;
 
-                if (!_mockCache.ContainsKey(typeof(TEntity))) {
-                    _mockCache.Add(typeof(TEntity), _dbContextToMock.Query<TEntity>().CreateDbQueryMock());
+                if (!_mockCache.ContainsKey(typeof(TQuery))) {
+                    _mockCache.Add(typeof(TQuery), _dbContextToMock.Query<TQuery>().CreateDbQueryMock(rows));
                 }
-                var dbQueryMock = (Mock<DbQuery<TEntity>>)_mockCache[typeof(TEntity)];
+                var dbQueryMock = (Mock<DbQuery<TQuery>>)_mockCache[typeof(TQuery)];
 
-                _dbContextMock.Setup(m => m.Query<TEntity>()).Returns(() => dbQueryMock.Object);
-
+                _dbContextMock.Setup(expression).Returns(() => dbQueryMock.Object);
+                _dbContextMock.Setup(m => m.Query<TQuery>()).Returns(() => dbQueryMock.Object);
+                
                 return this;
             }
 
-            return this;
+            throw new ArgumentException($"Unable to create a db query mock for {nameof(TQuery)} as it is not a defined as a query for the DbContext.");
         }
 
         /// <summary>
@@ -161,11 +153,11 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="queryProviderMock">The query provider mock to add.</param>
         /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Mock<IQueryProvider> queryProviderMock) where TEntity : class {
-            if(_dbContextProperties.Any(p => (typeof(DbSet<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())))) {
+            if (_dbContextProperties.SingleOrDefault(q => q.PropertyType == typeof(DbSet<TEntity>)) != null) {
                 var mock = ((Mock<DbSet<TEntity>>) GetOrCreateMockFor<TEntity>());
                 mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             }
-            else if (_dbContextProperties.Any(p => (typeof(DbQuery<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())))) {
+            else if (_dbContextProperties.SingleOrDefault(q => q.PropertyType == typeof(DbQuery<TEntity>)) != null) {
                 var mock = ((Mock<DbQuery<TEntity>>)GetOrCreateMockFor<TEntity>());
                 mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             }
@@ -183,11 +175,11 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             var queryProviderMock = new Mock<IQueryProvider>();
             queryProviderMock.SetUpFromSql(expectedFromSqlResult);
 
-            if (_dbContextProperties.Any(p => (typeof(DbSet<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())))) {
+            if (_dbContextProperties.SingleOrDefault(q => q.PropertyType == typeof(DbSet<TEntity>)) != null) {
                 var mock = ((Mock<DbSet<TEntity>>)GetOrCreateMockFor<TEntity>());
                 mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             }
-            else if (_dbContextProperties.Any(p => (typeof(DbQuery<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())))) {
+            else if (_dbContextProperties.SingleOrDefault(q => q.PropertyType == typeof(DbQuery<TEntity>)) != null) {
                 var mock = ((Mock<DbQuery<TEntity>>)GetOrCreateMockFor<TEntity>());
                 mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             }
@@ -208,19 +200,6 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <returns>The mocked DbContext.</returns>
         public TDbContext GetMockedDbContext() {
             return _dbContextMock.Object;
-        }
-        
-        /// <summary>
-        /// Gets the set up query mock for the specified entity.
-        /// </summary>
-        /// <typeparam name="TQueryable">The queryable type.</typeparam>
-        /// <typeparam name="TEntity">The entity type.</typeparam>
-        /// <returns>The query mock for the specified entity.</returns>
-        public Mock<TQueryable> GetQueryableMockFor<TQueryable, TEntity>()
-            where TQueryable : class, IQueryable<TEntity>
-            where TEntity : class 
-        {
-            return (Mock<TQueryable>) GetOrCreateMockFor<TEntity>();
         }
     }
 }

@@ -10,25 +10,23 @@
             </summary>
             <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.#ctor(System.Boolean,System.Boolean)">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.#ctor(System.Boolean)">
             <summary>
             Constructor.
             </summary>
             <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
-            <param name="addSetUpForAllQueries">If set to true all of the DbContext queries will be set up automatically.</param>
             <remarks>Automatically creates a new in-memory database that will be used to back the DbContext mock.
             Requires the <see>
                 <cref>TDbContext</cref>
             </see>
             type to have a DbContextOptions constructor.</remarks>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.#ctor(`0,System.Boolean,System.Boolean)">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.#ctor(`0,System.Boolean)">
             <summary>
             Constructor.
             </summary>
             <param name="dbContextToMock">The DbContext to mock.</param>
             <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
-            <param name="addSetUpForAllQueries">If set to true all of the DbContext queries will be set up automatically.</param>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpForAllSets">
             <summary>
@@ -36,17 +34,18 @@
             </summary>
             <returns>The DbContext mock builder.</returns>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpForAllQueries">
-            <summary>
-            Creates mocks for all of the DbContext queries.
-            </summary>
-            <returns>The DbContext mock builder.</returns>
-        </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpFor``1">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}})">
             <summary>
             Adds the mock set up for an entity.
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
+            <returns>The DbContext mock builder.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the mock set up for a query.
+            </summary>
+            <typeparam name="TQuery">The query type.</typeparam>
             <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddQueryProviderMockFor``1(Moq.Mock{System.Linq.IQueryProvider})">
@@ -77,14 +76,6 @@
             </summary>
             <returns>The mocked DbContext.</returns>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetQueryableMockFor``2">
-            <summary>
-            Gets the set up query mock for the specified entity.
-            </summary>
-            <typeparam name="TQueryable">The queryable type.</typeparam>
-            <typeparam name="TEntity">The entity type.</typeparam>
-            <returns>The query mock for the specified entity.</returns>
-        </member>
         <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbContextExtensions">
             <summary>
             Extensions for db contexts.
@@ -103,12 +94,13 @@
             Extensions for db queries.
             </summary>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbQueryExtensions.CreateDbQueryMock``1(Microsoft.EntityFrameworkCore.DbQuery{``0})">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbQueryExtensions.CreateDbQueryMock``1(Microsoft.EntityFrameworkCore.DbQuery{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Creates a DbQuery mock for the specified entity.
             </summary>
-            <typeparam name="TEntity">The DbQuery entity type.</typeparam>
+            <typeparam name="TQuery">The DbQuery query type.</typeparam>
             <param name="dbQuery">The DbQuery to mock.</param>
+            <param name="rows">The mock representation of the DbQuery.</param>
             <returns>A DbQuery mock for the specified entity.</returns>
         </member>
         <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbSetExtensions">
@@ -172,6 +164,20 @@
             <param name="searchFor">The string to find within the target</param>
             <param name="comparer">The string comparison.</param>
             <returns>True if the target string contains the search for string using the specified string comparison.</returns>
+        </member>
+        <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.Helpers.ExpressionHelper">
+            <summary>
+            Extensions for query provider mocks.
+            </summary>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Helpers.ExpressionHelper.CreatePropertyExpression``2(System.Reflection.PropertyInfo)">
+            <summary>
+            Creates a property expression.
+            </summary>
+            <typeparam name="TParameter">The expression parameter.</typeparam>
+            <typeparam name="TProperty">The expression property.</typeparam>
+            <param name="propertyInfo">The property info of the property to create the expression for.</param>
+            <returns></returns>
         </member>
     </members>
 </doc>

@@ -3,8 +3,8 @@
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     public class TestContext : DbContext {
 
-        public DbSet<TestEntity1> DbSetEntities { get; set; }
-        public DbQuery<TestEntity2> DbQueryEntities { get; set; }
+        public virtual DbSet<TestEntity1> TestEntities { get; set; }
+        public virtual DbQuery<TestEntity2> TestView { get; set; }
 
         public TestContext() {
 
@@ -12,6 +12,10 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
         public TestContext(DbContextOptions<TestContext> options) : base(options) {
 
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            modelBuilder.Query<TestEntity2>().ToView("SomeView");
         }
     }
 }
