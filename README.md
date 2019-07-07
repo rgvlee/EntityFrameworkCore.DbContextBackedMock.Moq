@@ -7,7 +7,7 @@ EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContex
 
 If it's just a wrapper, why bother using it? There's a couple of reasons.
 
-It's __designed to work with the Microsoft InMemory provider__ (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
+__It's designed to work with the Microsoft InMemory provider__ (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is
 often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where this library steps in. It has specific functionality to allow operations involving the FromSql extension to be included in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation). 
 
 If you're using the InMemory provider and you need to mock FromSql or want the additional coverage provided by Moq, this library will do the heavy lifting for you.
@@ -113,8 +113,7 @@ public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
 ### Testing FromSql
 The main difference here is that we need the seed data to set up query provider to return the expected result.
 Create in memory DbContext/mock DbContext/generate seed data/create and set up/invoke FromSql.
-In this case we didn't need to persist the seed data; it will depend on implementation of your FromSql usage (e.g., if FromSql is invoked with a repository 
-and the operation invokes other DbContext/DbSet operations you may need to persist the seed data).
+In this case we didn't need to persist the seed data, whether you do or not will depend what you're doing with the FromSql result.
 ```
 [Test]
 public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
@@ -143,7 +142,7 @@ Expanding on the previous example, for this test we create a mock query provider
 - The FromSql sql that we want to match;
 - A sequence of FromSql SqlParameters
 
-The FromSql sql set up is based on a case insensitive contains; in the example we're able to match on just the stored procedure name. The FromSql SqlParameters, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive as demonstrated below.
+The FromSql __sql__ set up matching is case insensitive and supports partial matches; in the example we're able to match on just the stored procedure name. The FromSql __SqlParameters__, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive however it does not support partial matches on the parameter name/value.
 Only FromSql SqlParameters provided to the query provider mock will be checked. All others will be ignored so you only need to specify the bare minimum for a mock setup match.
 ```
 [Test]
