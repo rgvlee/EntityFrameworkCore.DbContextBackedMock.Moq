@@ -65,7 +65,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             dbContextMock.Setup(m => m.RemoveRange(It.IsAny<object[]>())).Callback((object[] entities) => dbContextToMock.RemoveRange(entities));
             dbContextMock.As<IDbContextPoolable>().Setup(m => m.ResetState()).Callback(() => ((IDbContextPoolable)dbContextToMock).ResetState());
             dbContextMock.As<IDbContextPoolable>().Setup(m => m.Resurrect(It.IsAny<DbContextPoolConfigurationSnapshot>())).Callback((DbContextPoolConfigurationSnapshot configurationSnapshot) => ((IDbContextPoolable)dbContextToMock).Resurrect(configurationSnapshot));
-            dbContextMock.Setup(m => m.SaveChanges()).Returns(() => dbContextToMock.SaveChanges());
+            dbContextMock.Setup(m => m.SaveChanges()).Returns(dbContextToMock.SaveChanges);
             dbContextMock.Setup(m => m.SaveChanges(It.IsAny<bool>())).Returns((bool acceptAllChangesOnSuccess) => dbContextToMock.SaveChanges(acceptAllChangesOnSuccess));
             dbContextMock.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns((CancellationToken cancellationToken) => dbContextToMock.SaveChangesAsync(cancellationToken));
             dbContextMock.Setup(m => m.SaveChangesAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>())).Returns((bool acceptAllChangesOnSuccess, CancellationToken cancellationToken) => dbContextToMock.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));

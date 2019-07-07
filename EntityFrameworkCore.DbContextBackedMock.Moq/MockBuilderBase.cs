@@ -85,11 +85,14 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <returns>The DbContext mock builder.</returns>
         public MockBuilderBase<TDbContext> AddSetUpForAllDbSets() {
             foreach (var propertyInfo in DbContextToMock.GetPropertyInfoForAllDbSets()) {
-                var dbSetPropertyName = propertyInfo.Name;
-                var dbSetPropertyType = propertyInfo.PropertyType;
                 var entityType = propertyInfo.PropertyType.GenericTypeArguments.First();
-
+                // ReSharper disable PossibleNullReferenceException
+                // ReSharper disable UnusedVariable
+                // ReSharper disable ArrangeThisQualifier
                 var builder = this.GetType().GetMethod(nameof(GetOrCreateDbSetMockBuilderFor)).MakeGenericMethod(entityType).Invoke(this, null);
+                // ReSharper restore ArrangeThisQualifier
+                // ReSharper restore UnusedVariable
+                // ReSharper restore PossibleNullReferenceException
             }
 
             return this;

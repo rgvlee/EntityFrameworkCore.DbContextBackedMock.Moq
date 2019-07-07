@@ -175,10 +175,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             foreach (var sqlParameter in sqlParameters) {
                 sb.Append(sqlParameter.ParameterName);
                 sb.Append(": ");
-                if (sqlParameter.Value == null)
-                    sb.AppendLine("null");
-                else
-                    sb.AppendLine(sqlParameter.Value.ToString());
+                sb.AppendLine(sqlParameter.Value == null ? "null" : sqlParameter.Value.ToString());
             }
 
             return sb.ToString();
