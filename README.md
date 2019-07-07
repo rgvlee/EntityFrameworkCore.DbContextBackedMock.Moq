@@ -41,16 +41,19 @@ __Note: automatic DbContext creation requires a DbContext constructor with a sin
 public void Add_NewEntity_Persists() {
     var builder = new DbContextMockBuilder<TestContext>();
     var mockContext = builder.GetDbContextMock();
-    var context = mockContext.Object;
-
+    var mockedContext = mockContext.Object;
     var testEntity1 = new TestEntity1();
-    Assert.AreEqual(default(Guid), testEntity1.Id);
-    context.Set<TestEntity1>().Add(testEntity1);
-    context.SaveChanges();
 
-    Assert.AreNotEqual(default(Guid), testEntity1.Id);
-    Assert.AreEqual(testEntity1, context.Find<TestEntity1>(testEntity1.Id));
-    mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    mockedContext.Set<TestEntity1>().Add(testEntity1);
+    mockedContext.SaveChanges();
+
+    Assert.Multiple(() => {
+        Assert.AreNotEqual(default(Guid), testEntity1.Id);
+        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
+        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
+        Assert.AreEqual(testEntity1, mockedContext.Find<TestEntity1>(testEntity1.Id));
+        mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    });
 }
 ```
 Or if you want to provide your own DbContext and only set up a specified DbSet:
@@ -64,21 +67,27 @@ Or if you want to provide your own DbContext and only set up a specified DbSet:
 [Test]
 public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_Persists() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false)
-	builder.AddSetUpDbSetFor<TestEntity1>();
+    var builder = new DbContextMockBuilder<TestContext>(contextToMock, false).AddSetUpDbSetFor<TestEntity1>();
     var mockContext = builder.GetDbContextMock();
-            
-    var context = mockContext.Object;
+    var mockedContext = mockContext.Object;
     var testEntity1 = new TestEntity1();
-    Assert.AreEqual(default(Guid), testEntity1.Id);
+            
+    mockedContext.Set<TestEntity1>().Add(testEntity1);
+    mockedContext.SaveChanges();
 
-    context.Set<TestEntity1>().Add(testEntity1);
-    context.SaveChanges();
+    Assert.Multiple(() => {
+        Assert.AreNotEqual(default(Guid), testEntity1.Id);
 
-    Assert.AreNotEqual(default(Guid), testEntity1.Id);
-    Assert.AreEqual(testEntity1, contextToMock.Find<TestEntity1>(testEntity1.Id));
-    Assert.AreEqual(testEntity1, context.Find<TestEntity1>(testEntity1.Id));
-    mockContext.Verify(m => m.SaveChanges(), Times.Once);
+        Assert.IsTrue(contextToMock.Set<TestEntity1>().Any()); //DbSet
+        Assert.IsTrue(contextToMock.TestEntities.Any()); //DbContext DbSet<TEntity> property
+        Assert.AreEqual(testEntity1, contextToMock.Find<TestEntity1>(testEntity1.Id));
+
+        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
+        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
+        Assert.AreEqual(testEntity1, mockedContext.Find<TestEntity1>(testEntity1.Id));
+
+        mockContext.Verify(m => m.SaveChanges(), Times.Once);
+    });
 }
 ```
 The mock set up covers both Set<TEntity> and the DbContext DbSet<TEntity> property:
@@ -87,17 +96,18 @@ The mock set up covers both Set<TEntity> and the DbContext DbSet<TEntity> proper
 public void Add_NewEntity_PersistsToBothDbSetAndDbContextDbSetProperty() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
     var builder = new DbContextMockBuilder<TestContext>(contextToMock).AddSetUpForAllDbSets();
-
     var mockContext = builder.GetDbContextMock();
     var mockedContext = mockContext.Object;
-
     var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
     mockedContext.Set<TestEntity1>().AddRange(list1);
     mockedContext.SaveChanges();
 
-    Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
-    Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet<TEntity> property
-    CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
+    Assert.Multiple(() => {
+        Assert.IsTrue(mockedContext.Set<TestEntity1>().Any()); //DbSet
+        Assert.IsTrue(mockedContext.TestEntities.Any()); //DbContext DbSet property
+        CollectionAssert.AreEquivalent(mockedContext.Set<TestEntity1>().ToList(), mockedContext.TestEntities.ToList());
+    });
 }
 ```
 ### Testing FromSql
@@ -110,7 +120,7 @@ and the operation invokes other DbContext/DbSet operations you may need to persi
 public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
     var contextToMock = new TestContext(new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
     var builder = new DbContextMockBuilder<TestContext>(contextToMock);
-
+            
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
 
@@ -118,12 +128,14 @@ public void FromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
 
     var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-
+            
     var result = context.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
 
-    Assert.IsNotNull(result);
-    Assert.IsTrue(result.Any());
-    CollectionAssert.AreEquivalent(list1, result);
+    Assert.Multiple(() => {
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Any());
+        CollectionAssert.AreEquivalent(list1, result);
+    });
 }
 ```
 ### Testing FromSql with SqlParameters
@@ -141,7 +153,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
     var testEntity1 = new TestEntity1();
     var list1 = new List<TestEntity1> { testEntity1 };
-
+            
     var mockQueryProvider = new Mock<IQueryProvider>();
     var sqlParameter = new SqlParameter("@SomeParameter2", "Value2");
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, list1.AsQueryable());
@@ -149,11 +161,13 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
 
     var mockContext = builder.GetDbContextMock();
     var context = mockContext.Object;
-
+            
     var result = context.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
 
-    Assert.IsNotNull(result);
-    Assert.IsTrue(result.Any());
-    CollectionAssert.AreEquivalent(list1, result);
+    Assert.Multiple(() => {
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Any());
+        CollectionAssert.AreEquivalent(list1, result);
+    });
 }
 ```
