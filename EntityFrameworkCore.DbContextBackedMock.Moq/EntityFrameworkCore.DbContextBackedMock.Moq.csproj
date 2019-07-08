@@ -9,7 +9,7 @@
     <Company />
     <Description>Allows you to create a mock DbContext and have it backed by an actual DbContext. It's designed to be used with the in-memory provider.
 
-If you need to mock FromSql or a DbQuery&lt;&gt;, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.</Description>
+If you need to mock FromSql invocations, ExecuteSqlCommand invocations or a DbQuery&lt;&gt;, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.</Description>
     <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</RepositoryUrl>
     <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory DbContext Context testing test tests</PackageTags>
