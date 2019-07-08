@@ -58,7 +58,7 @@
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="expression">The DbContext property to set up.</param>
             <param name="queryProviderMock">The query provider mock to add.</param>
-            <returns></returns>
+            <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddFromSqlResultFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}},System.Collections.Generic.IEnumerable{``0})">
             <summary>
@@ -67,7 +67,7 @@
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="expression">The DbContext property to set up.</param>
             <param name="expectedFromSqlResult">The expected FromSql result.</param>
-            <returns></returns>
+            <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddQueryProviderMockFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},Moq.Mock{System.Linq.IQueryProvider})">
             <summary>
@@ -76,7 +76,7 @@
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="expression">The DbContext property to set up.</param>
             <param name="queryProviderMock">The query provider mock to add.</param>
-            <returns></returns>
+            <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddFromSqlResultFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},System.Collections.Generic.IEnumerable{``0})">
             <summary>
@@ -85,7 +85,31 @@
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="expression">The DbContext property to set up.</param>
             <param name="expectedFromSqlResult">The expected FromSql result.</param>
-            <returns></returns>
+            <returns>The DbContext mock builder.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddExecuteSqlCommandResult(System.String,System.Collections.Generic.IEnumerable{System.Data.SqlClient.SqlParameter},System.Int32)">
+            <summary>
+            Sets up ExecuteSqlCommand invocations containing a specified sql string and sql parameters to return a specified result. 
+            </summary>
+            <param name="executeSqlCommandCommandText">The ExecuteSqlCommand sql string. Mock set up supports case insensitive partial matches.</param>
+            <param name="sqlParameters">The ExecuteSqlCommand sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
+            <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+            <returns>The DbContext mock builder.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddExecuteSqlCommandResult(System.String,System.Int32)">
+            <summary>
+            Sets up ExecuteSqlCommand invocations containing a specified sql string to return a specified result. 
+            </summary>
+            <param name="executeSqlCommandCommandText">The ExecuteSqlCommand sql string. Mock set up supports case insensitive partial matches.</param>
+            <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+            <returns>The DbContext mock builder.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddExecuteSqlCommandResult(System.Int32)">
+            <summary>
+            Sets up ExecuteSqlCommand invocations to return a specified result. 
+            </summary>
+            <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+            <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetDbContextMock">
             <summary>
@@ -170,7 +194,7 @@
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.QueryProviderExtensions.SetUpFromSql``1(Moq.Mock{System.Linq.IQueryProvider},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-            Sets up FromSql invocations to return a specified sequence.
+            Sets up FromSql invocations to return a specified result.
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="queryProviderMock">The query provider mock.</param>
@@ -179,7 +203,7 @@
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.QueryProviderExtensions.SetUpFromSql``1(Moq.Mock{System.Linq.IQueryProvider},System.String,System.Collections.Generic.IEnumerable{``0})">
             <summary>
-            Sets up FromSql invocations containing a specified sql string to return a specified sequence. 
+            Sets up FromSql invocations containing a specified sql string to return a specified result. 
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="queryProviderMock">The query provider mock.</param>
@@ -189,7 +213,7 @@
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.QueryProviderExtensions.SetUpFromSql``1(Moq.Mock{System.Linq.IQueryProvider},System.String,System.Collections.Generic.IEnumerable{System.Data.SqlClient.SqlParameter},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-            Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified sequence. 
+            Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified result. 
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
             <param name="queryProviderMock">The query provider mock.</param>

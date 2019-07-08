@@ -1,14 +1,17 @@
 ﻿using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
 using EntityFrameworkCore.DbContextBackedMock.Moq.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// <summary>
@@ -143,7 +146,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="queryProviderMock">The query provider mock to add.</param>
-        /// <returns></returns>
+        /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock) 
             where TEntity : class {
             var mock = GetMockFromCache(expression.ReturnType);
@@ -157,7 +160,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="expectedFromSqlResult">The expected FromSql result.</param>
-        /// <returns></returns>
+        /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression, IEnumerable<TEntity> expectedFromSqlResult)
             where TEntity : class {
             var mock = GetMockFromCache(expression.ReturnType);
@@ -166,28 +169,28 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
-        
+
         /// <summary>
         /// Adds the specified query provider mock to the mock set up for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="queryProviderMock">The query provider mock to add.</param>
-        /// <returns></returns>
+        /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, DbQuery<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock)
             where TEntity : class {
             var mock = GetMockFromCache(expression.ReturnType);
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
-        
+
         /// <summary>
         /// Adds the specified query provider mock to the mock set up for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="expectedFromSqlResult">The expected FromSql result.</param>
-        /// <returns></returns>
+        /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, DbQuery<TEntity>>> expression, IEnumerable<TEntity> expectedFromSqlResult)
             where TEntity : class {
             var mock = GetMockFromCache(expression.ReturnType);
@@ -196,7 +199,74 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
-        
+
+        /// <summary>
+        /// Sets up ExecuteSqlCommand invocations containing a specified sql string and sql parameters to return a specified result. 
+        /// </summary>
+        /// <param name="executeSqlCommandCommandText">The ExecuteSqlCommand sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="sqlParameters">The ExecuteSqlCommand sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
+        /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(string executeSqlCommandCommandText, IEnumerable<SqlParameter> sqlParameters, int expectedResult) {
+            var relationalCommand = new Mock<IRelationalCommand>();
+            relationalCommand.Setup(m => m.ExecuteNonQuery(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>())).Returns(() => expectedResult);
+
+            var rawSqlCommand = new Mock<RawSqlCommand>(MockBehavior.Strict, relationalCommand.Object, new Dictionary<string, object>());
+            rawSqlCommand.Setup(m => m.RelationalCommand).Returns(() => relationalCommand.Object);
+            rawSqlCommand.Setup(m => m.ParameterValues).Returns(new Dictionary<string, object>());
+
+            var rawSqlCommandBuilder = new Mock<IRawSqlCommandBuilder>();
+            rawSqlCommandBuilder.Setup(m => m.Build(It.Is<string>(s => s.Contains(executeSqlCommandCommandText, StringComparison.CurrentCultureIgnoreCase)), It.Is<IEnumerable<object>>(
+                    parameters => !sqlParameters.Except(parameters.Select(p => (SqlParameter)p), new SqlParameterParameterNameAndValueEqualityComparer()).Any()
+                    )))
+                .Returns(rawSqlCommand.Object)
+                .Callback((string sql, IEnumerable<object> parameters) => {
+                    var sb = new StringBuilder();
+                    sb.Append(sql.GetType().Name);
+                    sb.Append(" sql: ");
+                    sb.AppendLine(sql);
+
+                    sb.AppendLine("Parameters:");
+                    foreach (var sqlParameter in parameters.Select(p => (SqlParameter) p)) {
+                        sb.Append(sqlParameter.ParameterName);
+                        sb.Append(": ");
+                        if (sqlParameter.Value == null)
+                            sb.AppendLine("null");
+                        else
+                            sb.AppendLine(sqlParameter.Value.ToString());
+                    }
+
+                    Console.WriteLine(sb.ToString());
+                });
+
+            var databaseFacade = new Mock<DatabaseFacade>(MockBehavior.Strict, _dbContextToMock);
+            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IConcurrencyDetector)))).Returns(new Mock<IConcurrencyDetector>().Object);
+            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IRawSqlCommandBuilder)))).Returns(rawSqlCommandBuilder.Object);
+            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IRelationalConnection)))).Returns(new Mock<IRelationalConnection>().Object);
+            
+            _dbContextMock.Setup(m => m.Database).Returns(databaseFacade.Object);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets up ExecuteSqlCommand invocations containing a specified sql string to return a specified result. 
+        /// </summary>
+        /// <param name="executeSqlCommandCommandText">The ExecuteSqlCommand sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(string executeSqlCommandCommandText, int expectedResult) {
+            return AddExecuteSqlCommandResult(executeSqlCommandCommandText, new List<SqlParameter>(), expectedResult);
+        }
+
+        /// <summary>
+        /// Sets up ExecuteSqlCommand invocations to return a specified result. 
+        /// </summary>
+        /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(int expectedResult) {
+            return AddExecuteSqlCommandResult(string.Empty, new List<SqlParameter>(), expectedResult);
+        }
+
         /// <summary>
         /// Gets the set up DbContext mock.
         /// </summary>

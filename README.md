@@ -1,24 +1,22 @@
 
 # EntityFrameworkCore.DbContextBackedMock.Moq
-__*The EntityFrameworkCore FromSql mocking library*__
+__*The EntityFrameworkCore FromSql, ExecuteSqlCommand and DbQuery<> mocking library*__
 
 EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext and have it backed by an actual DbContext.
 
 But why? There's a couple of reasons and it's from my own experience using the Microsoft in-memory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) in unit tests.
 
-The in-memory provider is __great__ for most cases however it doesn't do everything. If you're invoking FromSql or using views you're out of luck. It just doesn't work and nor could it, while EntityFrameworkCore can work with them they are not an EntityFrameworkCore concern. They are a data source concern.
+The in-memory provider is __great__ for most cases however it doesn't do everything. If you're invoking FromSql, ExecuteSqlCommand or using views you're out of luck. It just doesn't work and nor could it, while EntityFrameworkCore can work with them they are not an EntityFrameworkCore concern. They are a data source concern.
 
 So the issue is simple. I want to use the in-memory provider for most things and then mock the couple of bits it can't do. Unfortunately the only way to do this (without modifying the test subject/s) is to mock the DbContext.
 
-And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, provide a mock set up. Mocking FromSql invocations and query operations is easy using the provided methods. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
+And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, provide a mock set up. Mocking FromSql invocations, ExecuteSqlCommand invocations and query operations is easy using the provided methods. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
 ## Download
 NuGet: [https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
 ## Fluent interface
 The builder provides a fluent interface for building the DbContext, DbSet, and DbQuery mocks. I've designed the API to be intuitive and discoverable. The examples below touch on a bit of the available functionality.
 ## The disclaimer
 The library sets up a lot of the DbContext functionality but not all of it. I have built this based on my current needs. If you find this library useful and need additional behaviour mocked flick me a message and I'll see what I can do.
-### TODO
-- Add mock set up for DbContext.Database.ExecuteSqlCommand()
 ## Example Usage
 - Create the builder
 - Get the db context mock
@@ -174,5 +172,45 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
         Assert.IsTrue(result.Any());
         CollectionAssert.AreEquivalent(list1, result);
     });
+}
+```
+### Let's not forget ExecuteSqlCommand
+Very similar to FromSql with the main difference being the return type.
+
+Specified command text returning an expected result:
+```
+[Test]
+public void Execute_SetUpSpecifiedQuery_ReturnsExpectedResult() {
+    var builder = new DbContextMockBuilder<TestContext>();
+
+    var commandText = "sp_NoParams";
+    var expectedResult = 1;
+
+    builder.AddExecuteSqlCommandResult(commandText, new List<SqlParameter>(), expectedResult);
+
+    var mockedContext = builder.GetMockedDbContext();
+
+    var result = mockedContext.Database.ExecuteSqlCommand("sp_NoParams");
+
+    Assert.AreEqual(expectedResult, result);
+}
+```
+Specified command text and sql parameters returning an expected result:
+```
+[Test]
+public void Execute_SetUpSpecifiedQueryWithSqlParameters_ReturnsExpectedResult() {
+    var builder = new DbContextMockBuilder<TestContext>();
+    
+    var commandText = "sp_WithParams";
+    var sqlParameters = new List<SqlParameter>() {new SqlParameter("@SomeParameter2", "Value2")};
+    var expectedResult = 1;
+
+    builder.AddExecuteSqlCommandResult(commandText, sqlParameters, expectedResult);
+
+    var mockedContext = builder.GetMockedDbContext();
+
+    var result = mockedContext.Database.ExecuteSqlCommand("[dbo.[sp_WithParams] @SomeParameter2", sqlParameters);
+
+    Assert.AreEqual(expectedResult, result);
 }
 ```

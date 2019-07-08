@@ -15,7 +15,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// </summary>
     public static class QueryProviderExtensions {
         /// <summary>
-        /// Sets up FromSql invocations to return a specified sequence.
+        /// Sets up FromSql invocations to return a specified result.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
@@ -29,7 +29,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
         }
 
         /// <summary>
-        /// Sets up FromSql invocations containing a specified sql string to return a specified sequence. 
+        /// Sets up FromSql invocations containing a specified sql string to return a specified result. 
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
@@ -41,7 +41,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
         }
 
         /// <summary>
-        /// Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified sequence. 
+        /// Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified result. 
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="queryProviderMock">The query provider mock.</param>
