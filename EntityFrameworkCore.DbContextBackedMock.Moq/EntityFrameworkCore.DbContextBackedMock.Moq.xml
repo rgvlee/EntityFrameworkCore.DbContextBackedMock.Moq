@@ -14,7 +14,7 @@
             <summary>
             Constructor.
             </summary>
-            <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
+            <param name="addSetUpForAllDbSets">If set to true all of the DbContext sets will be set up automatically.</param>
             <remarks>Automatically creates a new in-memory database that will be used to back the DbContext mock.
             Requires the <see>
                 <cref>TDbContext</cref>
@@ -28,7 +28,7 @@
             <param name="dbContextToMock">The DbContext to mock.</param>
             <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpForAllSets">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpForAllDbSets">
             <summary>
             Creates mocks for all of the DbContext sets.
             </summary>
@@ -39,6 +39,7 @@
             Adds the mock set up for an entity.
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
             <returns>The DbContext mock builder.</returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddSetUpFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},System.Collections.Generic.IEnumerable{``0})">
@@ -46,23 +47,45 @@
             Adds the mock set up for a query.
             </summary>
             <typeparam name="TQuery">The query type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
+            <param name="sequence">The sequence to use for operations on the query.</param>
             <returns>The DbContext mock builder.</returns>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddQueryProviderMockFor``1(Moq.Mock{System.Linq.IQueryProvider})">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddQueryProviderMockFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}},Moq.Mock{System.Linq.IQueryProvider})">
             <summary>
             Adds the specified query provider mock to the mock set up for the specified entity.
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
             <param name="queryProviderMock">The query provider mock to add.</param>
-            <returns>The DbContext mock builder.</returns>
+            <returns></returns>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddFromSqlResultFor``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddFromSqlResultFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-            Adds the specified expected FromSql result to the mock set up for the specified entity.
+            Adds the specified query provider mock to the mock set up for the specified entity.
             </summary>
             <typeparam name="TEntity">The entity type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
             <param name="expectedFromSqlResult">The expected FromSql result.</param>
-            <returns>The DbContext mock builder.</returns>
+            <returns></returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddQueryProviderMockFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},Moq.Mock{System.Linq.IQueryProvider})">
+            <summary>
+            Adds the specified query provider mock to the mock set up for the specified entity.
+            </summary>
+            <typeparam name="TEntity">The entity type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
+            <param name="queryProviderMock">The query provider mock to add.</param>
+            <returns></returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.AddFromSqlResultFor``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the specified query provider mock to the mock set up for the specified entity.
+            </summary>
+            <typeparam name="TEntity">The entity type.</typeparam>
+            <param name="expression">The DbContext property to set up.</param>
+            <param name="expectedFromSqlResult">The expected FromSql result.</param>
+            <returns></returns>
         </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetDbContextMock">
             <summary>
@@ -75,6 +98,30 @@
             Gets the set up mocked DbContext.
             </summary>
             <returns>The mocked DbContext.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetDbSetMock``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}})">
+            <summary>
+            Gets the set up DbSet mock for the specified DbContext property.
+            </summary>
+            <returns>The mocked DbSet.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetMockedDbSet``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbSet{``0}}})">
+            <summary>
+            Gets the set up mocked DbSet for the specified DbContext property.
+            </summary>
+            <returns>The mocked DbSet.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetDbQueryMock``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}})">
+            <summary>
+            Gets the set up DbQuery mock for the specified DbContext property.
+            </summary>
+            <returns>The mocked DbQuery.</returns>
+        </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.DbContextMockBuilder`1.GetMockedDbQuery``1(System.Linq.Expressions.Expression{System.Func{`0,Microsoft.EntityFrameworkCore.DbQuery{``0}}})">
+            <summary>
+            Gets the set up mocked DbQuery for the specified DbContext property.
+            </summary>
+            <returns>The mocked DbQuery.</returns>
         </member>
         <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbContextExtensions">
             <summary>
@@ -100,7 +147,7 @@
             </summary>
             <typeparam name="TQuery">The DbQuery query type.</typeparam>
             <param name="dbQuery">The DbQuery to mock.</param>
-            <param name="rows">The mock representation of the DbQuery.</param>
+            <param name="sequence">The sequence to use for the DbQuery.</param>
             <returns>A DbQuery mock for the specified entity.</returns>
         </member>
         <member name="T:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.DbSetExtensions">
@@ -140,7 +187,7 @@
             <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
             <returns>The query provider mock.</returns>
         </member>
-        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.QueryProviderExtensions.SetUpFromSql``1(Moq.Mock{System.Linq.IQueryProvider},System.String,System.Collections.Generic.IEnumerable{System.Data.SqlClient.SqlParameter},System.Linq.IQueryable{``0})">
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.Extensions.QueryProviderExtensions.SetUpFromSql``1(Moq.Mock{System.Linq.IQueryProvider},System.String,System.Collections.Generic.IEnumerable{System.Data.SqlClient.SqlParameter},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Sets up FromSql invocations containing a specified sql string and sql parameters to return a specified sequence. 
             </summary>

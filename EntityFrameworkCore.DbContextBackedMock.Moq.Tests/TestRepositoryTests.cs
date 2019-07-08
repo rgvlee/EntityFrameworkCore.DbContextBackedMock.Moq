@@ -34,7 +34,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                     new SqlParameter("@SomeParameter2", "SomeParameter2Value")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor(x => x.TestEntities, mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithNoParameters().ToList();
 
@@ -68,7 +68,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                     new SqlParameter("@SomeParameter2", "Value2")
                 };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor(x => x.TestEntities, mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
 
@@ -102,7 +102,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 new SqlParameter("@SomeParameter2", "1234")
             };
             mockQueryProvider.SetUpFromSql(repository.GetUsingStoredProcedureWithParametersSql, sqlParameters, list2.AsQueryable());
-            builder.AddQueryProviderMockFor<TestEntity1>(mockQueryProvider);
+            builder.AddQueryProviderMockFor(x => x.TestEntities, mockQueryProvider);
 
             var result1 = repository.GetUsingStoredProcedureWithParameters().ToList();
 

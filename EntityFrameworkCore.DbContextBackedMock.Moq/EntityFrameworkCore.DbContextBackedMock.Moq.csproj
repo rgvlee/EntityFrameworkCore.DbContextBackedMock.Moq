@@ -4,14 +4,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>EntityFrameworkCore.DbContextBackedMock.Moq</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.2.1</Version>
+    <Version>0.3.1</Version>
     <Authors>rgvlee</Authors>
     <Company />
-    <Description>Allows you to create a mock DbContext (and mock DbSets) that delegates the operations to a DbContext (in-memory or otherwise).
+    <Description>Allows you to create a mock DbContext and have it backed by an actual DbContext. It's designed to be used with the in-memory provider.
 
-Mocks the FromSql extension including set up matches on the RawSqlString sql and the SqlParameter parameters. Automatic mock set up of the DbContext and all DbSets combined with a fluent builder for ease of use.
-
-Designed to work in conjuction with the Microsoft InMemory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) that is often used for testing. The InMemory provider is great for most cases however it doesn't do everything. That's where this library steps in. It has specific functionality to allow operations tha invoke the FromSql extension to be included in your tests, as well as all of the benefits of using a mocking framework (e.g., the ability to verify method invocation).</Description>
+If you need to mock FromSql or a DbQuery&lt;&gt;, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.</Description>
     <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</RepositoryUrl>
     <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory DbContext Context testing test tests</PackageTags>
@@ -19,8 +17,8 @@ Designed to work in conjuction with the Microsoft InMemory provider (https://doc
     <Copyright>Copyright (c) 2019 Lee Anderson</Copyright>
     <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq</PackageId>
     <Product>EntityFrameworkCore.DbContextBackedMock.Moq</Product>
-    <AssemblyVersion>0.2.1.0</AssemblyVersion>
-    <FileVersion>0.2.1.0</FileVersion>
+    <AssemblyVersion>0.3.1.0</AssemblyVersion>
+    <FileVersion>0.3.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
