@@ -226,5 +226,5 @@ public void Execute_SetUpSpecifiedQueryWithSqlParameters_ReturnsExpectedResult()
     Assert.AreEqual(expectedResult, result);
 }
 ```
-### Advanced usage
+## Advanced usage
 If you want to get your hands dirty I've provided a few methods on the builder for you to use your own DbSet<>, DbQuery and IQueryProvider mocks. The extensions that I use to create these mocks are also available to get you going.
