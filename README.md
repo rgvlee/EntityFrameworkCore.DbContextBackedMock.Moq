@@ -92,7 +92,7 @@ public void SetUpFromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResul
     var expectedResult = new List<TestEntity1> { new TestEntity1() };
 
     var builder = new DbContextMockBuilder<TestContext>();
-    builder.AddSetUpFor(x => x.TestEntities).AddFromSqlResultFor(x => x.TestEntities, expectedResult);
+    builder.AddFromSqlResultFor(x => x.TestEntities, expectedResult);
     var mockedContext = builder.GetMockedDbContext();
 
     var actualResult = mockedContext.Set<TestEntity1>().FromSql("sp_NoParams").ToList();
@@ -118,7 +118,7 @@ public void SetUpFromSql_SpecifiedStoredProcedureAndParameters_ReturnsExpectedRe
     var expectedResult = new List<TestEntity1> {new TestEntity1()};
         
     var builder = new DbContextMockBuilder<TestContext>();
-    builder.AddSetUpFor(x => x.TestEntities).AddFromSqlResultFor(x => x.TestEntities, "sp_Specified", sqlParameters, expectedResult);
+    builder.AddFromSqlResultFor(x => x.TestEntities, "sp_Specified", sqlParameters, expectedResult);
     var mockedContext = builder.GetMockedDbContext();
 
     var actualResult = mockedContext.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();
@@ -143,7 +143,7 @@ public void SetUpFromSql_MockQueryProviderWithSpecifiedStoredProcedureAndParamet
     mockQueryProvider.SetUpFromSql("sp_Specified", new List<SqlParameter> { sqlParameter }, expectedResult);
 
     var builder = new DbContextMockBuilder<TestContext>();
-    builder.AddSetUpFor(x => x.TestEntities).AddQueryProviderMockFor(x => x.TestEntities, mockQueryProvider);
+    builder.AddQueryProviderMockFor(x => x.TestEntities, mockQueryProvider);
     var mockedContext = builder.GetMockedDbContext();
             
     var actualResult = mockedContext.Set<TestEntity1>().FromSql("[dbo].[sp_Specified] @SomeParameter1 @SomeParameter2", new SqlParameter("@someparameter2", "Value2")).ToList();

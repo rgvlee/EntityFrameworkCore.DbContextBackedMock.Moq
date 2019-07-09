@@ -1,11 +1,10 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Data.SqlClient;
-using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
 using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     [TestFixture]
