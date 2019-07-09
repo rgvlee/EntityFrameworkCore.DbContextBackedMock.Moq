@@ -11,7 +11,7 @@ The in-memory provider is __great__ for most cases however it doesn't do everyth
 
 So the issue is simple. I want to use the in-memory provider for most things and then mock the couple of bits it can't do. Unfortunately the only way to do this (without modifying the test subject/s) is to mock the DbContext.
 
-And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, use a mock. Mocking FromSql invocations, ExecuteSqlCommand invocations and query operations is easy using the provided methods. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
+And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, use a mock. Mocking the FromSql and ExecuteSqlCommand methods and views is easy using the provided methods. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
 ## Download
 NuGet: [https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
 ## Fluent interface
