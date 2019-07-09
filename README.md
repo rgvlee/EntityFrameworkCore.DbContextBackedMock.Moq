@@ -78,8 +78,13 @@ public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_PersistsToBothDbSet
 ```
 
 ### Testing FromSql
-The main difference here is that we need the seed data to set up query provider to return the expected result.
-Create in memory DbContext/mock DbContext/generate seed data/create and set up/invoke FromSql.
+The main difference here is that we need the seed data to set up FromSql to return the expected result.
+- Generate seed data
+- Create the builder
+- Set up the FromSql result
+- Get the db context mock
+- Consume
+
 In this case we didn't need to persist the seed data, whether you do or not will depend what you're doing with the FromSql result.
 ```
 [Test]
@@ -101,12 +106,11 @@ public void SetUpFromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResul
 ```
 
 ### Testing FromSql with SqlParameters
-Expanding on the previous example, for this test we create a mock query provider and specify:
+Expanding on the previous example, for this test we specify:
 - The FromSql sql that we want to match;
 - A sequence of FromSql SqlParameters
 
-The FromSql __sql__ set up matching is case insensitive and supports partial matches; in the example we're able to match on just the stored procedure name. The FromSql __SqlParameters__, if provided to the query provider mock, must be provided in the FromSql invocation for a match to occur. Again, the match is case insensitive however it does not support partial matches on the parameter name/value.
-Only FromSql SqlParameters provided to the query provider mock will be checked. All others will be ignored so you only need to specify the bare minimum for a mock set up match.
+The mock FromSql __sql__ set up matching is case insensitive and supports partial matches; in the example we're able to match on just the stored procedure name. The mock FromSql __SqlParameters__ matching is case insensitive and supports partial sequence matching however it does not support partial matches on the parameter name/value. You only need to specify the bare minimum for a mock set up match.
 ```
 [Test]
 public void SetUpFromSql_SpecifiedStoredProcedureAndParameters_ReturnsExpectedResult() {
