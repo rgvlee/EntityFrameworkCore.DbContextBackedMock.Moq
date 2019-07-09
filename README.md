@@ -5,7 +5,7 @@ __*The EntityFrameworkCore FromSql, ExecuteSqlCommand and DbQuery<> mocking libr
 
 EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext and have it backed by an actual DbContext.
 
-But why? There's a couple of reasons and it's from my own experience using the Microsoft in-memory provider (https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) in unit tests.
+But why? There's a couple of reasons and it's from my own experience using the [https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory](Microsoft in-memory provider) in unit tests.
 
 The in-memory provider is __great__ for most cases however it doesn't do everything. If you're invoking FromSql, ExecuteSqlCommand or using views you're out of luck. It just doesn't work and nor could it, while EntityFrameworkCore can work with them they are not an EntityFrameworkCore concern. They are a data source concern.
 
@@ -13,8 +13,8 @@ So the issue is simple. I want to use the in-memory provider for most things and
 
 And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, use a mock. Mocking views and the FromSql and ExecuteSqlCommand methods is easy using the provided builder. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
 ## Resources
-Source repository: https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq
-NuGet: [https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
+[https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq](Source repository)
+[https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/](NuGet)
 ## Fluent interface
 The builder provides a fluent interface for building the mocks so it should be intuitive and discoverable. The examples below touch on a bit of the available functionality.
 ## The disclaimer
