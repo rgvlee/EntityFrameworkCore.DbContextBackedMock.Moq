@@ -1,6 +1,3 @@
-
-
-
 # EntityFrameworkCore.DbContextBackedMock.Moq
 __*The EntityFrameworkCore FromSql, ExecuteSqlCommand and DbQuery<> mocking library*__
 
@@ -13,13 +10,17 @@ The in-memory provider is __great__ for most cases however it doesn't do everyth
 So the issue is simple. I want to use the in-memory provider for most things and then mock the couple of bits it can't do. Unfortunately the only way to do this (without modifying the test subject/s) is to mock the DbContext.
 
 And that's just what this library does. The mocks will funnel the majority of the operations to the actual DbContext. For everything else, use a mock. Mocking views and the FromSql and ExecuteSqlCommand methods is easy using the provided builder. As a bonus you get all the benefits of using a mocking framework (e.g., the ability to verify method invocation). __You can have your cake and eat it too!__
+
 ## Resources
 - [Source repository](https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq)
 - [NuGet](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
+
 ## Fluent interface
 The builder provides a fluent interface for building the mocks so it should be intuitive and discoverable. The examples below touch on a bit of the available functionality.
+
 ## The disclaimer
 The library sets up a lot of the DbContext functionality but I am not going to claim it does everything. I have built this based on my current needs. If you find this library useful and something is missing, not working as you'd expect or you need additional behaviour mocked flick me a message and I'll see what I can do.
+
 ## Example Usage
 - Create the builder
 - Get the db context mock
@@ -75,6 +76,7 @@ public void AddWithSpecifiedDbContextAndDbSetSetUp_NewEntity_PersistsToBothDbSet
     });
 }
 ```
+
 ### Testing FromSql
 The main difference here is that we need the seed data to set up query provider to return the expected result.
 Create in memory DbContext/mock DbContext/generate seed data/create and set up/invoke FromSql.
@@ -97,6 +99,7 @@ public void SetUpFromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResul
     });
 }
 ```
+
 ### Testing FromSql with SqlParameters
 Expanding on the previous example, for this test we create a mock query provider and specify:
 - The FromSql sql that we want to match;
@@ -123,6 +126,7 @@ public void SetUpFromSql_SpecifiedStoredProcedureAndParameters_ReturnsExpectedRe
     });
 }
 ```
+
 ### Roll your own query provider mock
 You can always create your own mock query provider; below is functionally the same as the test from the previous section. 
 ```
@@ -147,6 +151,7 @@ public void SetUpFromSql_MockQueryProviderWithSpecifiedStoredProcedureAndParamet
     });
 }
 ```
+
 ### What about Queries?
 Haven't forgotten about them. Queries can't really be set up automatically as to be useful you need to seed them. Not a big hassle though, set up is easy.
 ```
@@ -188,6 +193,7 @@ public void FromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult
     });
 }
 ```
+
 ### Let's not forget ExecuteSqlCommand
 Very similar to FromSql with the main difference being the return type.
 
@@ -228,5 +234,6 @@ public void Execute_SetUpSpecifiedQueryWithSqlParameters_ReturnsExpectedResult()
     Assert.AreEqual(expectedResult, result);
 }
 ```
+
 ## Advanced usage
 If you want to get your hands dirty I've provided a few methods on the builder for you to use your own DbSet<>, DbQuery and IQueryProvider mocks. The extensions that I use to create these mocks are also available to get you going.
