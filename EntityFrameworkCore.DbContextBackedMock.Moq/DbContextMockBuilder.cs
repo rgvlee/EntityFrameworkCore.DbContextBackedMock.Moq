@@ -44,20 +44,20 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// Constructor.
         /// </summary>
         /// <param name="dbContextToMock">The DbContext to mock.</param>
-        /// <param name="addSetUpForAllSets">If set to true all of the DbContext sets will be set up automatically.</param>
-        public DbContextMockBuilder(TDbContext dbContextToMock, bool addSetUpForAllSets = true) {
+        /// <param name="addSetUpForAllDbSets">If set to true all of the DbContext sets will be set up automatically.</param>
+        public DbContextMockBuilder(TDbContext dbContextToMock, bool addSetUpForAllDbSets = true) {
             _mockCache = new Dictionary<Type, Mock>();
 
             _dbContextToMock = dbContextToMock;
             
             _dbContextMock = _dbContextToMock.CreateDbContextMock();
 
-            if (addSetUpForAllSets) AddSetUpForAllDbSets();
+            if (addSetUpForAllDbSets) AddSetUpForAllDbSets();
         }
 
         private Mock GetMockFromCache(Type key) {
             var mock = _mockCache[key];
-            if (mock == null) throw new Exception($"<{key.Name}> has not been set up.");
+            if (mock == null) throw new Exception($"No set up found for '<{key.Name}>'.");
             return mock;
         }
 
@@ -91,15 +91,11 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
+        /// <param name="dbSetMock">The mock DbSet.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddSetUpFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
-            var key = expression.ReturnType;
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TEntity>(
+            Expression<Func<TDbContext, DbSet<TEntity>>> expression, Mock<DbSet<TEntity>> dbSetMock) where TEntity : class {
 
-            if (!_mockCache.ContainsKey(key)) {
-                _mockCache.Add(key, _dbContextToMock.Set<TEntity>().CreateDbSetMock());
-            }
-            var dbSetMock = (Mock<DbSet<TEntity>>)_mockCache[key];
-            
             _dbContextMock.Setup(m => m.Add(It.IsAny<TEntity>())).Returns((TEntity entity) => _dbContextToMock.Add(entity));
             _dbContextMock.Setup(m => m.AddAsync(It.IsAny<TEntity>(), It.IsAny<CancellationToken>())).Returns((TEntity entity, CancellationToken cancellationToken) => _dbContextToMock.AddAsync(entity, cancellationToken));
             _dbContextMock.Setup(m => m.Attach(It.IsAny<TEntity>())).Returns((TEntity entity) => _dbContextToMock.Attach(entity));
@@ -114,7 +110,40 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             _dbContextMock.Setup(expression).Returns(() => dbSetMock.Object);
             _dbContextMock.Setup(m => m.Set<TEntity>()).Returns(() => dbSetMock.Object);
             _dbContextMock.Setup(m => m.Update(It.IsAny<TEntity>())).Returns((TEntity entity) => _dbContextToMock.Update(entity));
-            
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the mock set up for an entity.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <param name="expression">The DbContext property to set up.</param>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
+            var key = expression.ReturnType.GetGenericArguments().Single();
+
+            if (!_mockCache.ContainsKey(key)) {
+                _mockCache.Add(key, _dbContextToMock.Set<TEntity>().CreateDbSetMock());
+            }
+            var dbSetMock = (Mock<DbSet<TEntity>>)_mockCache[key];
+
+            AddSetUpFor(expression, dbSetMock);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the mock set up for a query.
+        /// </summary>
+        /// <typeparam name="TQuery">The query type.</typeparam>
+        /// <param name="expression">The DbContext property to set up.</param>
+        /// <param name="dbQueryMock">The mock DbQuery.</param>
+        /// <returns>The DbContext mock builder.</returns>
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, Mock<DbQuery<TQuery>> dbQueryMock) where TQuery : class {
+            _dbContextMock.Setup(expression).Returns(() => dbQueryMock.Object);
+            _dbContextMock.Setup(m => m.Query<TQuery>()).Returns(() => dbQueryMock.Object);
+
             return this;
         }
 
@@ -126,20 +155,19 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="sequence">The sequence to use for operations on the query.</param>
         /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, IEnumerable<TQuery> sequence) where TQuery : class {
-            var key = expression.ReturnType;
-
+            var key = expression.ReturnType.GetGenericArguments().Single();
+            
             if (!_mockCache.ContainsKey(key)) {
                 _mockCache.Add(key, _dbContextToMock.Query<TQuery>().CreateDbQueryMock(sequence));
             }
             
             var dbQueryMock = (Mock<DbQuery<TQuery>>)_mockCache[key];
 
-            _dbContextMock.Setup(expression).Returns(() => dbQueryMock.Object);
-            _dbContextMock.Setup(m => m.Query<TQuery>()).Returns(() => dbQueryMock.Object);
+            AddSetUpFor(expression, dbQueryMock);
             
             return this;
         }
-
+        
         /// <summary>
         /// Adds the specified query provider mock to the mock set up for the specified entity.
         /// </summary>
@@ -147,23 +175,23 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="queryProviderMock">The query provider mock to add.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock) 
+        public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, IQueryable<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock)
             where TEntity : class {
-            var mock = GetMockFromCache(expression.ReturnType);
+            var mock = GetMockFromCache(expression.ReturnType.GetGenericArguments().Single());
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
-
+        
         /// <summary>
-        /// Adds the specified query provider mock to the mock set up for the specified entity.
+        /// Mocks the FromSql result for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="expectedFromSqlResult">The expected FromSql result.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression, IEnumerable<TEntity> expectedFromSqlResult)
+        public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, IQueryable<TEntity>>> expression, IEnumerable<TEntity> expectedFromSqlResult)
             where TEntity : class {
-            var mock = GetMockFromCache(expression.ReturnType);
+            var mock = GetMockFromCache(expression.ReturnType.GetGenericArguments().Single());
             var queryProviderMock = new Mock<IQueryProvider>();
             queryProviderMock.SetUpFromSql(expectedFromSqlResult);
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
@@ -171,31 +199,36 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         }
 
         /// <summary>
-        /// Adds the specified query provider mock to the mock set up for the specified entity.
+        /// Mocks the FromSql result for invocations containing the specified sql string for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
-        /// <param name="queryProviderMock">The query provider mock to add.</param>
+        /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="expectedFromSqlResult">The expected FromSql result.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, DbQuery<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock)
+        public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, IQueryable<TEntity>>> expression, string sql, IEnumerable<TEntity> expectedFromSqlResult)
             where TEntity : class {
-            var mock = GetMockFromCache(expression.ReturnType);
+            var mock = GetMockFromCache(expression.ReturnType.GetGenericArguments().Single());
+            var queryProviderMock = new Mock<IQueryProvider>();
+            queryProviderMock.SetUpFromSql(sql, expectedFromSqlResult);
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
 
         /// <summary>
-        /// Adds the specified query provider mock to the mock set up for the specified entity.
+        /// Mocks the FromSql result for invocations containing the specified sql string and sql parameters for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property to set up.</param>
+        /// <param name="sql">The FromSql sql string. Mock set up supports case insensitive partial matches.</param>
+        /// <param name="sqlParameters">The FromSql sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
         /// <param name="expectedFromSqlResult">The expected FromSql result.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, DbQuery<TEntity>>> expression, IEnumerable<TEntity> expectedFromSqlResult)
+        public DbContextMockBuilder<TDbContext> AddFromSqlResultFor<TEntity>(Expression<Func<TDbContext, IQueryable<TEntity>>> expression, string sql, IEnumerable<SqlParameter> sqlParameters, IEnumerable<TEntity> expectedFromSqlResult)
             where TEntity : class {
-            var mock = GetMockFromCache(expression.ReturnType);
+            var mock = GetMockFromCache(expression.ReturnType.GetGenericArguments().Single());
             var queryProviderMock = new Mock<IQueryProvider>();
-            queryProviderMock.SetUpFromSql(expectedFromSqlResult);
+            queryProviderMock.SetUpFromSql(sql, sqlParameters, expectedFromSqlResult);
             mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
             return this;
         }
@@ -208,6 +241,13 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
         /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(string executeSqlCommandCommandText, IEnumerable<SqlParameter> sqlParameters, int expectedResult) {
+            //ExecuteSqlCommand creates a RawSqlCommand then ExecuteNonQuery is executed on the relational command property.
+            //We need to:
+            //1) Mock the relational command ExecuteNonQuery method
+            //2) Mock the RawSqlCommand (doesn't implement any interfaces so we have to use a the concrete class which requires a constructor to be specified)
+            //3) Mock the IRawSqlCommandBuilder build method to return our RawSqlCommand
+            //4) Mock multiple the database facade GetService methods to avoid the 'Relational-specific methods can only be used when the context is using a relational database provider.' exception.
+            
             var relationalCommand = new Mock<IRelationalCommand>();
             relationalCommand.Setup(m => m.ExecuteNonQuery(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>())).Returns(() => expectedResult);
 
@@ -288,7 +328,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <returns>The mocked DbSet.</returns>
         public Mock<DbSet<TEntity>> GetDbSetMock<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
-            var mock = ((Mock<DbSet<TEntity>>)GetMockFromCache(expression.ReturnType));
+            var mock = ((Mock<DbSet<TEntity>>)GetMockFromCache(expression.ReturnType.GetGenericArguments().Single()));
             return mock;
         }
 
@@ -305,7 +345,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <returns>The mocked DbQuery.</returns>
         public Mock<DbQuery<TEntity>> GetDbQueryMock<TEntity>(Expression<Func<TDbContext, DbQuery<TEntity>>> expression) where TEntity : class {
-            var mock = ((Mock<DbQuery<TEntity>>)GetMockFromCache(expression.ReturnType));
+            var mock = ((Mock<DbQuery<TEntity>>)GetMockFromCache(expression.ReturnType.GetGenericArguments().Single()));
             return mock;
         }
         
