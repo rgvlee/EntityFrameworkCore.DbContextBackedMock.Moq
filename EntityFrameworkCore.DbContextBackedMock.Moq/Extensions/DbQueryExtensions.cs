@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Moq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
     /// <summary>
@@ -22,13 +24,15 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
 
             var queryableSequence = sequence.AsQueryable();
 
-            dbQueryMock.As<IAsyncEnumerableAccessor<TQuery>>().Setup(m => m.AsyncEnumerable).Returns(queryableSequence.ToAsyncEnumerable);
-            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.ElementType).Returns(queryableSequence.ElementType);
-            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.Expression).Returns(queryableSequence.Expression);
-            dbQueryMock.As<IEnumerable>().Setup(m => m.GetEnumerator()).Returns(queryableSequence.GetEnumerator());
-            dbQueryMock.As<IEnumerable<TQuery>>().Setup(m => m.GetEnumerator()).Returns(queryableSequence.GetEnumerator());
-            //dbQueryMock.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance).Returns();
-            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.Provider).Returns(queryableSequence.Provider);
+            dbQueryMock.As<IAsyncEnumerableAccessor<TQuery>>().Setup(m => m.AsyncEnumerable).Returns(queryableSequence.ToAsyncEnumerable); //.Callback(() => Console.WriteLine("AsyncEnumerable invoked"));
+            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.ElementType).Returns(queryableSequence.ElementType); //.Callback(() => Console.WriteLine("ElementType invoked"));
+            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.Expression).Returns(queryableSequence.Expression); //.Callback(() => Console.WriteLine("Expression invoked"));
+            dbQueryMock.As<IEnumerable>().Setup(m => m.GetEnumerator()).Returns(queryableSequence.GetEnumerator()); //.Callback(() => Console.WriteLine("IEnumerable.GetEnumerator invoked"));
+
+            dbQueryMock.As<IEnumerable<TQuery>>().Setup(m => m.GetEnumerator()).Returns(queryableSequence.GetEnumerator()); //.Callback(() => Console.WriteLine("IEnumerable<TQuery>.GetEnumerator invoked"));
+
+            dbQueryMock.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance).Returns(() => ((IInfrastructure<IServiceProvider>)dbQueryMock.Object).Instance); //.Callback(() => Console.WriteLine("Instance invoked"));
+            dbQueryMock.As<IQueryable<TQuery>>().Setup(m => m.Provider).Returns(queryableSequence.Provider); //.Callback(() => Console.WriteLine("Provider invoked"));
 
             return dbQueryMock;
         }

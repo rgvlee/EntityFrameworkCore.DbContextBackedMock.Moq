@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
@@ -245,6 +246,24 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Any());
             CollectionAssert.AreEquivalent(list1, result);
+        }
+
+        [Test]
+        public async Task AsyncAddAndPersist_Enumeration_Persists() {
+            var list1 = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var mockedContext = builder.GetMockedDbContext();
+
+            await mockedContext.Set<TestEntity1>().AddRangeAsync(list1);
+            await mockedContext.SaveChangesAsync();
+            
+            var result = mockedContext.Set<TestEntity1>().ToList();
+
+            Assert.Multiple(() => {
+                CollectionAssert.AreEquivalent(list1, result);
+                CollectionAssert.AreEquivalent(result, mockedContext.TestEntities.ToList());
+            });
         }
     }
 }

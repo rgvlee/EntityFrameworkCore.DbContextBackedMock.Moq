@@ -12,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq {
     /// <summary>
@@ -141,9 +142,14 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="dbQueryMock">The mock DbQuery.</param>
         /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, Mock<DbQuery<TQuery>> dbQueryMock) where TQuery : class {
-            _dbContextMock.Setup(expression).Returns(() => dbQueryMock.Object);
-            _dbContextMock.Setup(m => m.Query<TQuery>()).Returns(() => dbQueryMock.Object);
+            _dbContextMock.Setup(expression)
+                .Callback(() => ((IEnumerable<TQuery>)dbQueryMock.Object).GetEnumerator().Reset())
+                .Returns(() => dbQueryMock.Object);
 
+            _dbContextMock.Setup(m => m.Query<TQuery>())
+                .Callback(() => ((IEnumerable<TQuery>) dbQueryMock.Object).GetEnumerator().Reset())
+                .Returns(() => dbQueryMock.Object);
+            
             return this;
         }
 
@@ -250,6 +256,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
             
             var relationalCommand = new Mock<IRelationalCommand>();
             relationalCommand.Setup(m => m.ExecuteNonQuery(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>())).Returns(() => expectedResult);
+            relationalCommand.Setup(m => m.ExecuteNonQueryAsync(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult(expectedResult));
 
             var rawSqlCommand = new Mock<RawSqlCommand>(MockBehavior.Strict, relationalCommand.Object, new Dictionary<string, object>());
             rawSqlCommand.Setup(m => m.RelationalCommand).Returns(() => relationalCommand.Object);

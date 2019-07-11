@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>EntityFrameworkCore.DbContextBackedMock.Moq</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <Authors>rgvlee</Authors>
     <Company />
     <Description>Allows you to create a mock DbContext and have it backed by an actual DbContext. It's designed to be used with the in-memory provider.
@@ -12,13 +12,13 @@
 If you need to mock FromSql invocations, ExecuteSqlCommand invocations or a DbQuery&lt;&gt;, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.</Description>
     <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</RepositoryUrl>
-    <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory DbContext Context testing test tests</PackageTags>
+    <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory In-Memory DbContext Context testing test tests FromSql ExecuteSqlCommand DbQuery</PackageTags>
     <PackageLicenseUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq/blob/master/License.txt</PackageLicenseUrl>
     <Copyright>Copyright (c) 2019 Lee Anderson</Copyright>
     <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq</PackageId>
     <Product>EntityFrameworkCore.DbContextBackedMock.Moq</Product>
-    <AssemblyVersion>0.5.0.0</AssemblyVersion>
-    <FileVersion>0.5.0.0</FileVersion>
+    <AssemblyVersion>0.6.0.0</AssemblyVersion>
+    <FileVersion>0.6.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

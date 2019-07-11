@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     [TestFixture]
@@ -70,6 +71,22 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             Assert.Throws<NullReferenceException>(() => {
                 var result = mockedContext.Database.ExecuteSqlCommand("sp_NoParams");
             });
+        }
+
+        [Test]
+        public async Task ExecuteAsync_SetUpUnspecifiedQuery_ReturnsExpectedResult() {
+            var builder = new DbContextMockBuilder<TestContext>();
+
+            var commandText = "";
+            var expectedResult = 1;
+
+            builder.AddExecuteSqlCommandResult(commandText, new List<SqlParameter>(), expectedResult);
+
+            var mockedContext = builder.GetMockedDbContext();
+
+            var result = await mockedContext.Database.ExecuteSqlCommandAsync("sp_NoParams");
+            
+            Assert.AreEqual(expectedResult, result);
         }
     }
 }
