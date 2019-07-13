@@ -4,12 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>EntityFrameworkCore.DbContextBackedMock.Moq</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Authors>rgvlee</Authors>
     <Company />
-    <Description>Allows you to create a mock DbContext and have it backed by an actual DbContext. It's designed to be used with the in-memory provider.
+    <Description>EntityFrameworkCore DbContext, DbSet, DbQuery, FromSql and ExecuteSqlCommand mocking library.
 
-If you need to mock FromSql invocations, ExecuteSqlCommand invocations or a DbQuery&lt;&gt;, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.</Description>
+If you need to mock the FromSql/ExecuteSqlCommand/ExecuteSqlCommandAsync extensions, a Query, or simply want the benefits of using a mocking framework (e.g., the ability to verify method invocation) this library will sort you out.
+
+Designed to be used with the in-memory provider to provide a complete DbContext that you can include in your tests. Have your cake and eat it too!</Description>
     <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</RepositoryUrl>
     <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory In-Memory DbContext Context testing test tests FromSql ExecuteSqlCommand DbQuery</PackageTags>
@@ -17,8 +19,8 @@ If you need to mock FromSql invocations, ExecuteSqlCommand invocations or a DbQu
     <Copyright>Copyright (c) 2019 Lee Anderson</Copyright>
     <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq</PackageId>
     <Product>EntityFrameworkCore.DbContextBackedMock.Moq</Product>
-    <AssemblyVersion>0.6.0.0</AssemblyVersion>
-    <FileVersion>0.6.0.0</FileVersion>
+    <AssemblyVersion>0.7.0.0</AssemblyVersion>
+    <FileVersion>0.7.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

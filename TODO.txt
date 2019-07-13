@@ -1,5 +1,3 @@
 # TODO
 - Add the ability to specify a delegate function for from sql/execute sql command invocations
-- ExecuteSqlCommandAsync support
-- Update existing tests in line with best practice (method names, scope etc)
 - Add tests for untested functionality
