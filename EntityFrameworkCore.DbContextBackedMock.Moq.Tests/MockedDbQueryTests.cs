@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     [TestFixture]
     public class MockedDbQueryTests {
         [Test]
-        public void SetUpFromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
+        public void SetUpFromSql_AnyStoredProcedureWithNoParametersToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -25,9 +25,26 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 CollectionAssert.AreEquivalent(actualResult1, actualResult2);
             });
         }
-        
+
         [Test]
-        public void SetUpFromSql_SpecifiedStoredProcedureWithParameters_ReturnsExpectedResult() {
+        public async Task SetUpFromSql_AnyStoredProcedureWithNoParametersAsyncToList_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult).AddFromSqlResultFor(x => x.TestView, expectedResult);
+            var mockedContext = builder.GetMockedDbContext();
+
+            var actualResult1 = await mockedContext.Query<TestEntity2>().FromSql("sp_NoParams").ToListAsync();
+            var actualResult2 = await mockedContext.Query<TestEntity2>().FromSql("sp_NoParams").ToListAsync();
+
+            Assert.Multiple(() => {
+                CollectionAssert.AreEquivalent(expectedResult, actualResult1);
+                CollectionAssert.AreEquivalent(actualResult1, actualResult2);
+            });
+        }
+
+        [Test]
+        public void SetUpFromSql_SpecifiedStoredProcedureWithParametersToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2> { new TestEntity2() };
             var sqlParameters = new List<SqlParameter> { new SqlParameter("@SomeParameter2", "Value2")};
 

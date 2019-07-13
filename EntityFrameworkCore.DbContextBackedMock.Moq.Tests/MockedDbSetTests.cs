@@ -143,7 +143,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpFromSql_AnyStoredProcedureWithNoParameters_ReturnsExpectedResult() {
+        public void SetUpFromSql_AnyStoredProcedureWithNoParametersToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity1> { new TestEntity1() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -160,7 +160,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpFromSql_SpecifiedStoredProcedureAndParameters_ReturnsExpectedResult() {
+        public void SetUpFromSql_SpecifiedStoredProcedureAndParametersToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity1> { new TestEntity1() };
             var sqlParameters = new List<SqlParameter>() { new SqlParameter("@SomeParameter2", "Value2") };
             
@@ -178,7 +178,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpFromSql_MockQueryProviderWithSpecifiedStoredProcedureAndParameters_ReturnsExpectedResult() {
+        public void SetUpFromSql_MockQueryProviderWithSpecifiedStoredProcedureAndParametersToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity1> { new TestEntity1() };
             var sqlParameters = new List<SqlParameter>() { new SqlParameter("@SomeParameter2", "Value2") };
             
@@ -199,7 +199,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpFromSql_SpecifiedStoredProcedureWithInvalidParameters_ReturnsEmptyEnumeration() {
+        public void SetUpFromSql_SpecifiedStoredProcedureWithInvalidParametersToList_ReturnsEmptyEnumeration() {
             var testEntity1 = new TestEntity1() { Id = Guid.NewGuid() };
             var sqlParameters = new List<SqlParameter>
             {
@@ -230,7 +230,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpFromSql_SpecifiedStoredProcedureWithNullParameterValue_ReturnsExpectedResult() {
+        public void SetUpFromSql_SpecifiedStoredProcedureWithNullParameterValueToList_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity1> { new TestEntity1() };
             var sqlParameters = new List<SqlParameter>() { new SqlParameter("@SomeParameter2", SqlDbType.DateTime) };
             

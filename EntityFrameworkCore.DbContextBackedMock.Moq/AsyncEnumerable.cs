@@ -11,6 +11,14 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="expression">The expression.</param>
         public AsyncEnumerable(Expression expression) : base(expression) { }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        public AsyncEnumerable(IEnumerable<T> enumerable) : base(enumerable) {
+            
+        }
+
         /// <inheritdoc />
         public IAsyncEnumerator<T> GetEnumerator() => new AsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
     }

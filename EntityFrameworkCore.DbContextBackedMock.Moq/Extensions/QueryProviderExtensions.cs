@@ -22,8 +22,11 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
         /// <param name="expectedFromSqlResult">The sequence to return when FromSql is invoked.</param>
         /// <returns>The query provider mock.</returns>
         public static Mock<IQueryProvider> SetUpFromSql<TEntity>(this Mock<IQueryProvider> queryProviderMock, IEnumerable<TEntity> expectedFromSqlResult) where TEntity : class {
+
+            var createQueryResult = new EntityFrameworkCore.DbContextBackedMock.Moq.AsyncEnumerable<TEntity>(expectedFromSqlResult);
+
             queryProviderMock.Setup(p => p.CreateQuery<TEntity>(It.IsAny<MethodCallExpression>()))
-                .Returns(expectedFromSqlResult.AsQueryable());
+                .Returns(createQueryResult);
 
             return queryProviderMock;
         }
@@ -59,10 +62,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
 
             //return source.Provider.CreateQuery<TEntity>((Expression) Expression.Call((Expression) null, RelationalQueryableExtensions.FromSqlMethodInfo.MakeGenericMethod(typeof (TEntity)), source.Expression, (Expression) Expression.Constant((object) sql), (Expression) Expression.Constant((object) parameters)));
 
+            var createQueryResult = new EntityFrameworkCore.DbContextBackedMock.Moq.AsyncEnumerable<TEntity>(expectedFromSqlResult);
+
             queryProviderMock.Setup(
                     p => p.CreateQuery<TEntity>(It.Is<MethodCallExpression>(mce => SpecifiedParametersMatchMethodCallExpression(mce, sql, sqlParameters)))
                 )
-                .Returns(expectedFromSqlResult.AsQueryable())
+                .Returns(createQueryResult)
                 .Callback((MethodCallExpression mce) => {
                     Console.WriteLine("FromSql inputs:");
                     Console.WriteLine(StringifyFromSqlMethodCallExpression(mce));

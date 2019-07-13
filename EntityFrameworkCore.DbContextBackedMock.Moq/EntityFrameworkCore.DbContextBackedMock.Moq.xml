@@ -13,6 +13,12 @@
             </summary>
             <param name="expression">The expression.</param>
         </member>
+        <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.AsyncEnumerable`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="enumerable">The enumerable.</param>
+        </member>
         <member name="M:EntityFrameworkCore.DbContextBackedMock.Moq.AsyncEnumerable`1.GetEnumerator">
             <inheritdoc />
         </member>
