@@ -246,5 +246,61 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 CollectionAssert.AreEquivalent(actualResult1, actualResult2);
             });
         }
+
+        [Test]
+        public void GetDbSetMock_ByType_ReturnsDbSetMock() {
+            var expectedResult = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var mockedContext = builder.GetMockedDbContext();
+            mockedContext.Set<TestEntity1>().AddRange(expectedResult);
+            mockedContext.SaveChanges();
+
+            var dbSetMock = builder.GetDbSetMock<TestEntity1>();
+
+            CollectionAssert.AreEquivalent(expectedResult, dbSetMock.Object.ToList());
+        }
+
+        [Test]
+        public void GetDbSetMock_ByExpression_ReturnsDbSetMock() {
+            var expectedResult = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var mockedContext = builder.GetMockedDbContext();
+            mockedContext.Set<TestEntity1>().AddRange(expectedResult);
+            mockedContext.SaveChanges();
+
+            var dbSetMock = builder.GetDbSetMock(x => x.TestEntities);
+
+            CollectionAssert.AreEquivalent(expectedResult, dbSetMock.Object.ToList());
+        }
+
+        [Test]
+        public void GetMockedDbSet_ByType_ReturnsDbSetMock() {
+            var expectedResult = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var mockedContext = builder.GetMockedDbContext();
+            mockedContext.Set<TestEntity1>().AddRange(expectedResult);
+            mockedContext.SaveChanges();
+
+            var mockedDbSet = builder.GetMockedDbSet<TestEntity1>();
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbSet.ToList());
+        }
+
+        [Test]
+        public void GetMockedDbSet_ByExpression_ReturnsDbSetMock() {
+            var expectedResult = new List<TestEntity1>() { new TestEntity1(), new TestEntity1() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var mockedContext = builder.GetMockedDbContext();
+            mockedContext.Set<TestEntity1>().AddRange(expectedResult);
+            mockedContext.SaveChanges();
+
+            var mockedDbSet = builder.GetMockedDbSet(x => x.TestEntities);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbSet.ToList());
+        }
     }
 }

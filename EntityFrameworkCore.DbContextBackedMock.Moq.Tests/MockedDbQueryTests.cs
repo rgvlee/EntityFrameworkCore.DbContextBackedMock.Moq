@@ -168,5 +168,53 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 Assert.AreSame(actualResult1, actualResult2);
             });
         }
+
+        [Test]
+        public void GetDbQueryMock_ByType_ReturnsDbQueryMock() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult);
+
+            var dbQueryMock = builder.GetDbQueryMock<TestEntity2>();
+
+            CollectionAssert.AreEquivalent(expectedResult, dbQueryMock.Object.ToList());
+        }
+
+        [Test]
+        public void GetDbQueryMock_ByExpression_ReturnsDbQueryMock() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult);
+
+            var dbQueryMock = builder.GetDbQueryMock(x => x.TestView);
+
+            CollectionAssert.AreEquivalent(expectedResult, dbQueryMock.Object.ToList());
+        }
+
+        [Test]
+        public void GetMockedDbQuery_ByType_ReturnsDbQueryMock() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult);
+
+            var mockedDbQuery = builder.GetMockedDbQuery<TestEntity2>();
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbQuery.ToList());
+        }
+
+        [Test]
+        public void GetMockedDbQuery_ByExpression_ReturnsDbQueryMock() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult);
+
+            var mockedDbQuery = builder.GetMockedDbQuery(x => x.TestView);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbQuery.ToList());
+        }
     }
 }
