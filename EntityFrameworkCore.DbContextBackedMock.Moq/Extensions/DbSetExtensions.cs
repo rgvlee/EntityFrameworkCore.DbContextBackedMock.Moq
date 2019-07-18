@@ -77,5 +77,19 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions {
 
             return dbSetMock;
         }
+
+        /// <summary>
+        /// Sets up the provider for a DbSet mock.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <param name="dbSetMock">The DbSet mock.</param>
+        /// <param name="queryProviderMock">The query provider mock.</param>
+        /// <returns>The DbSet mock.</returns>
+        public static Mock<DbSet<TEntity>> SetUpProvider<TEntity>(this Mock<DbSet<TEntity>> dbSetMock, Mock<IQueryProvider> queryProviderMock)
+            where TEntity : class
+        {
+            dbSetMock.As<IQueryable<TEntity>>().SetUpProvider(queryProviderMock);
+            return dbSetMock;
+        }
     }
 }

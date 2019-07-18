@@ -184,7 +184,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         public DbContextMockBuilder<TDbContext> AddQueryProviderMockFor<TEntity>(Expression<Func<TDbContext, IQueryable<TEntity>>> expression, Mock<IQueryProvider> queryProviderMock)
             where TEntity : class {
             var mock = GetMockFromCache(expression.ReturnType.GetGenericArguments().Single());
-            mock.As<IQueryable<TEntity>>().Setup(m => m.Provider).Returns(queryProviderMock.Object);
+            mock.As<IQueryable<TEntity>>().SetUpProvider(queryProviderMock);
             return this;
         }
         
@@ -335,7 +335,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>The DbSet mock.</returns>
-        public Mock<DbSet<TEntity>> GetDbSetMock<TEntity>() where TEntity : class {
+        public Mock<DbSet<TEntity>> GetDbSetMockFor<TEntity>() where TEntity : class {
             var mock = ((Mock<DbSet<TEntity>>)GetMockFromCache(typeof(TEntity)));
             return mock;
         }
@@ -346,7 +346,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property.</param>
         /// <returns>The DbSet mock.</returns>
-        public Mock<DbSet<TEntity>> GetDbSetMock<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
+        public Mock<DbSet<TEntity>> GetDbSetMockFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
             var mock = ((Mock<DbSet<TEntity>>)GetMockFromCache(expression.ReturnType.GetGenericArguments().Single()));
             return mock;
         }
@@ -356,8 +356,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <returns>The mocked DbSet.</returns>
-        public DbSet<TEntity> GetMockedDbSet<TEntity>() where TEntity : class {
-            return GetDbSetMock<TEntity>().Object;
+        public DbSet<TEntity> GetMockedDbSetFor<TEntity>() where TEntity : class {
+            return GetDbSetMockFor<TEntity>().Object;
         }
 
         /// <summary>
@@ -366,8 +366,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="expression">The DbContext property.</param>
         /// <returns>The mocked DbSet.</returns>
-        public DbSet<TEntity> GetMockedDbSet<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
-            return GetDbSetMock(expression).Object;
+        public DbSet<TEntity> GetMockedDbSetFor<TEntity>(Expression<Func<TDbContext, DbSet<TEntity>>> expression) where TEntity : class {
+            return GetDbSetMockFor(expression).Object;
         }
         
         /// <summary>
@@ -375,7 +375,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <returns>The DbQuery mock.</returns>
-        public Mock<DbQuery<TQuery>> GetDbQueryMock<TQuery>() where TQuery : class {
+        public Mock<DbQuery<TQuery>> GetDbQueryMockFor<TQuery>() where TQuery : class {
             var mock = ((Mock<DbQuery<TQuery>>)GetMockFromCache(typeof(TQuery)));
             return mock;
         }
@@ -386,7 +386,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <param name="expression">The DbContext property.</param>
         /// <returns>The DbQuery mock.</returns>
-        public Mock<DbQuery<TQuery>> GetDbQueryMock<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression) where TQuery : class {
+        public Mock<DbQuery<TQuery>> GetDbQueryMockFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression) where TQuery : class {
             var mock = ((Mock<DbQuery<TQuery>>)GetMockFromCache(expression.ReturnType.GetGenericArguments().Single()));
             return mock;
         }
@@ -396,8 +396,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// </summary>
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <returns>The mocked DbQuery.</returns>
-        public DbQuery<TQuery> GetMockedDbQuery<TQuery>() where TQuery : class {
-            return GetDbQueryMock<TQuery>().Object;
+        public DbQuery<TQuery> GetMockedDbQueryFor<TQuery>() where TQuery : class {
+            return GetDbQueryMockFor<TQuery>().Object;
         }
 
         /// <summary>
@@ -406,8 +406,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <param name="expression">The DbContext property.</param>
         /// <returns>The mocked DbQuery.</returns>
-        public DbQuery<TQuery> GetMockedDbQuery<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression) where TQuery : class {
-            return GetDbQueryMock(expression).Object;
+        public DbQuery<TQuery> GetMockedDbQueryFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression) where TQuery : class {
+            return GetDbQueryMockFor(expression).Object;
         }
     }
 }

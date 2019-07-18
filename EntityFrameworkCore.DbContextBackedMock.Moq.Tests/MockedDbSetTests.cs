@@ -256,7 +256,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             mockedContext.Set<TestEntity1>().AddRange(expectedResult);
             mockedContext.SaveChanges();
 
-            var dbSetMock = builder.GetDbSetMock<TestEntity1>();
+            var dbSetMock = builder.GetDbSetMockFor<TestEntity1>();
 
             CollectionAssert.AreEquivalent(expectedResult, dbSetMock.Object.ToList());
         }
@@ -270,7 +270,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             mockedContext.Set<TestEntity1>().AddRange(expectedResult);
             mockedContext.SaveChanges();
 
-            var dbSetMock = builder.GetDbSetMock(x => x.TestEntities);
+            var dbSetMock = builder.GetDbSetMockFor(x => x.TestEntities);
 
             CollectionAssert.AreEquivalent(expectedResult, dbSetMock.Object.ToList());
         }
@@ -284,7 +284,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             mockedContext.Set<TestEntity1>().AddRange(expectedResult);
             mockedContext.SaveChanges();
 
-            var mockedDbSet = builder.GetMockedDbSet<TestEntity1>();
+            var mockedDbSet = builder.GetMockedDbSetFor<TestEntity1>();
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbSet.ToList());
         }
@@ -298,7 +298,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             mockedContext.Set<TestEntity1>().AddRange(expectedResult);
             mockedContext.SaveChanges();
 
-            var mockedDbSet = builder.GetMockedDbSet(x => x.TestEntities);
+            var mockedDbSet = builder.GetMockedDbSetFor(x => x.TestEntities);
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbSet.ToList());
         }

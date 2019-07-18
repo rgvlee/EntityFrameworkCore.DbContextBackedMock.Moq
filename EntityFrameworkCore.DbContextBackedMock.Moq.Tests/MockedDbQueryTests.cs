@@ -176,7 +176,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var builder = new DbContextMockBuilder<TestContext>();
             builder.AddSetUpFor(x => x.TestView, expectedResult);
 
-            var dbQueryMock = builder.GetDbQueryMock<TestEntity2>();
+            var dbQueryMock = builder.GetDbQueryMockFor<TestEntity2>();
 
             CollectionAssert.AreEquivalent(expectedResult, dbQueryMock.Object.ToList());
         }
@@ -188,7 +188,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var builder = new DbContextMockBuilder<TestContext>();
             builder.AddSetUpFor(x => x.TestView, expectedResult);
 
-            var dbQueryMock = builder.GetDbQueryMock(x => x.TestView);
+            var dbQueryMock = builder.GetDbQueryMockFor(x => x.TestView);
 
             CollectionAssert.AreEquivalent(expectedResult, dbQueryMock.Object.ToList());
         }
@@ -200,7 +200,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var builder = new DbContextMockBuilder<TestContext>();
             builder.AddSetUpFor(x => x.TestView, expectedResult);
 
-            var mockedDbQuery = builder.GetMockedDbQuery<TestEntity2>();
+            var mockedDbQuery = builder.GetMockedDbQueryFor<TestEntity2>();
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbQuery.ToList());
         }
@@ -212,7 +212,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var builder = new DbContextMockBuilder<TestContext>();
             builder.AddSetUpFor(x => x.TestView, expectedResult);
 
-            var mockedDbQuery = builder.GetMockedDbQuery(x => x.TestView);
+            var mockedDbQuery = builder.GetMockedDbQueryFor(x => x.TestView);
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbQuery.ToList());
         }
