@@ -220,7 +220,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpQueryOnMockPostBuilder_Enumeration_ReturnsExpectedResult()
+        public void SetUpQueryByExpressionOnMockPostBuilder_Enumeration_ReturnsExpectedResult()
         {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
@@ -236,7 +236,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpQueryOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
+        public void SetUpQueryByExpressionOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -247,6 +247,37 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             //retained the dbContextMock and mockedDbContext
             var dbQueryMock = mockedDbContext.CreateDbQueryMockFor(x => x.TestView, expectedResult);
             dbContextMock.SetUpDbQueryFor(x => x.TestView, dbQueryMock);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
+        }
+        
+        [Test]
+        public void SetUpQueryByTypeOnMockPostBuilder_Enumeration_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            dbContextMock.SetUpDbQueryFor(expectedResult);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
+        }
+
+        [Test]
+        public void SetUpQueryByTypeOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            var dbQueryMock = mockedDbContext.CreateDbQueryMockFor(expectedResult);
+            dbContextMock.SetUpDbQueryFor(dbQueryMock);
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
         }

@@ -241,52 +241,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="sqlParameters">The ExecuteSqlCommand sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
         /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(string executeSqlCommandCommandText, IEnumerable<SqlParameter> sqlParameters, int expectedResult) {
-            //ExecuteSqlCommand creates a RawSqlCommand then ExecuteNonQuery is executed on the relational command property.
-            //We need to:
-            //1) Mock the relational command ExecuteNonQuery method
-            //2) Mock the RawSqlCommand (doesn't implement any interfaces so we have to use a the concrete class which requires a constructor to be specified)
-            //3) Mock the IRawSqlCommandBuilder build method to return our RawSqlCommand
-            //4) Mock multiple the database facade GetService methods to avoid the 'Relational-specific methods can only be used when the context is using a relational database provider.' exception.
-            
-            var relationalCommand = new Mock<IRelationalCommand>();
-            relationalCommand.Setup(m => m.ExecuteNonQuery(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>())).Returns(() => expectedResult);
-            relationalCommand.Setup(m => m.ExecuteNonQueryAsync(It.IsAny<IRelationalConnection>(), It.IsAny<IReadOnlyDictionary<string, object>>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult(expectedResult));
-
-            var rawSqlCommand = new Mock<RawSqlCommand>(MockBehavior.Strict, relationalCommand.Object, new Dictionary<string, object>());
-            rawSqlCommand.Setup(m => m.RelationalCommand).Returns(() => relationalCommand.Object);
-            rawSqlCommand.Setup(m => m.ParameterValues).Returns(new Dictionary<string, object>());
-
-            var rawSqlCommandBuilder = new Mock<IRawSqlCommandBuilder>();
-            rawSqlCommandBuilder.Setup(m => m.Build(It.Is<string>(s => s.Contains(executeSqlCommandCommandText, StringComparison.CurrentCultureIgnoreCase)), It.Is<IEnumerable<object>>(
-                    parameters => !sqlParameters.Except(parameters.Select(p => (SqlParameter)p), new SqlParameterParameterNameAndValueEqualityComparer()).Any()
-                    )))
-                .Returns(rawSqlCommand.Object)
-                .Callback((string sql, IEnumerable<object> parameters) => {
-                    var sb = new StringBuilder();
-                    sb.Append(sql.GetType().Name);
-                    sb.Append(" sql: ");
-                    sb.AppendLine(sql);
-
-                    sb.AppendLine("Parameters:");
-                    foreach (var sqlParameter in parameters.Select(p => (SqlParameter) p)) {
-                        sb.Append(sqlParameter.ParameterName);
-                        sb.Append(": ");
-                        if (sqlParameter.Value == null)
-                            sb.AppendLine("null");
-                        else
-                            sb.AppendLine(sqlParameter.Value.ToString());
-                    }
-
-                    Console.WriteLine(sb.ToString());
-                });
-
-            var databaseFacade = new Mock<DatabaseFacade>(MockBehavior.Strict, _dbContextToMock);
-            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IConcurrencyDetector)))).Returns(new Mock<IConcurrencyDetector>().Object);
-            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IRawSqlCommandBuilder)))).Returns(rawSqlCommandBuilder.Object);
-            databaseFacade.As<IInfrastructure<IServiceProvider>>().Setup(m => m.Instance.GetService(It.Is<Type>(t => t == typeof(IRelationalConnection)))).Returns(new Mock<IRelationalConnection>().Object);
-            
-            _dbContextMock.Setup(m => m.Database).Returns(databaseFacade.Object);
+        public DbContextMockBuilder<TDbContext> AddExecuteSqlCommandResult(string executeSqlCommandCommandText, IEnumerable<SqlParameter> sqlParameters, int expectedResult)
+        {
+            _dbContextMock.AddExecuteSqlCommandResult(executeSqlCommandCommandText, sqlParameters, expectedResult);
             return this;
         }
 

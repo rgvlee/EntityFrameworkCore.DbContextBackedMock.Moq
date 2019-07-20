@@ -133,7 +133,22 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
             where TDbContext : DbContext
             where TQuery : class
         {
-            return DbQueryHelper.CreateDbQueryMock(sequence);
+            return DbQueryHelper.CreateDbQueryMock<TQuery>(sequence);
+        }
+
+        /// <summary>
+        /// Creates and sets up a DbQuery mock for the specified entity.
+        /// </summary>
+        /// <typeparam name="TDbContext">The DbContext type.</typeparam>
+        /// <typeparam name="TQuery">The query type.</typeparam>
+        /// <param name="dbContext">The DbContext.</param>
+        /// <param name="sequence">The sequence to use for the DbQuery.</param>
+        /// <returns></returns>
+        public static Mock<DbQuery<TQuery>> CreateDbQueryMockFor<TDbContext, TQuery>(this TDbContext dbContext,
+            IEnumerable<TQuery> sequence)
+            where TDbContext : DbContext
+            where TQuery : class {
+            return DbQueryHelper.CreateDbQueryMock<TQuery>(sequence);
         }
     }
 }
