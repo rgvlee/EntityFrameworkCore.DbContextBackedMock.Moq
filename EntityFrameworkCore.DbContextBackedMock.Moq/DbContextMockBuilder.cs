@@ -73,7 +73,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
                 (typeof(DbSet<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())));
 
             foreach (var property in properties) {
-                var entityType = property.PropertyType.GenericTypeArguments.First();
+                var entityType = property.PropertyType.GenericTypeArguments.Single();
                 // ReSharper disable PossibleNullReferenceException
                 // ReSharper disable UnusedVariable
                 // ReSharper disable ArrangeThisQualifier
@@ -141,15 +141,20 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="expression">The DbContext property to set up.</param>
         /// <param name="dbQueryMock">The mock DbQuery.</param>
         /// <returns>The DbContext mock builder.</returns>
-        public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, Mock<DbQuery<TQuery>> dbQueryMock) where TQuery : class {
-            _dbContextMock.Setup(expression)
-                .Callback(() => ((IEnumerable<TQuery>)dbQueryMock.Object).GetEnumerator().Reset())
-                .Returns(() => dbQueryMock.Object);
+        public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, Mock<DbQuery<TQuery>> dbQueryMock) where TQuery : class
+        {
+            var key = expression.ReturnType.GetGenericArguments().Single();
 
-            _dbContextMock.Setup(m => m.Query<TQuery>())
-                .Callback(() => ((IEnumerable<TQuery>) dbQueryMock.Object).GetEnumerator().Reset())
-                .Returns(() => dbQueryMock.Object);
-            
+            if (!_mockCache.ContainsKey(key)) {
+                _mockCache.Add(key, dbQueryMock);
+            }
+            else
+            {
+                _mockCache[key] = dbQueryMock;
+            }
+
+            _dbContextMock.SetUpDbQueryFor(expression, dbQueryMock);
+
             return this;
         }
 
@@ -161,17 +166,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq {
         /// <param name="sequence">The sequence to use for operations on the query.</param>
         /// <returns>The DbContext mock builder.</returns>
         public DbContextMockBuilder<TDbContext> AddSetUpFor<TQuery>(Expression<Func<TDbContext, DbQuery<TQuery>>> expression, IEnumerable<TQuery> sequence) where TQuery : class {
-            var key = expression.ReturnType.GetGenericArguments().Single();
-            
-            if (!_mockCache.ContainsKey(key)) {
-                _mockCache.Add(key, _dbContextToMock.Query<TQuery>().CreateDbQueryMock(sequence));
-            }
-            
-            var dbQueryMock = (Mock<DbQuery<TQuery>>)_mockCache[key];
-
-            AddSetUpFor(expression, dbQueryMock);
-            
-            return this;
+            return AddSetUpFor(expression, DbQueryHelper.CreateDbQueryMock(sequence));
         }
         
         /// <summary>

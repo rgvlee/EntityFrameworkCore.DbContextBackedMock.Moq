@@ -24,7 +24,7 @@ Designed to be used with the in-memory provider to provide a complete DbContext 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>\\marge\home\Git\EntityFrameworkCore.DbContextBackedMock.Moq\EntityFrameworkCore.DbContextBackedMock.Moq\EntityFrameworkCore.DbContextBackedMock.Moq.xml</DocumentationFile>
+    <DocumentationFile>EntityFrameworkCore.DbContextBackedMock.Moq.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

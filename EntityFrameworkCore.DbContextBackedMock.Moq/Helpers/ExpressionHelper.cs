@@ -2,11 +2,13 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers
+{
     /// <summary>
-    /// Extensions for query provider mocks.
+    /// Helper methods for expressions.
     /// </summary>
-    public static class ExpressionHelper {
+    public static class ExpressionHelper
+    {
         /// <summary>
         /// Creates a property expression.
         /// </summary>
@@ -14,9 +16,12 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers {
         /// <typeparam name="TProperty">The expression property.</typeparam>
         /// <param name="propertyInfo">The property info of the property to create the expression for.</param>
         /// <returns></returns>
-        public static Expression<Func<TParameter, TProperty>> CreatePropertyExpression<TParameter, TProperty>(PropertyInfo propertyInfo) {
+        public static Expression<Func<TParameter, TProperty>> CreatePropertyExpression<TParameter, TProperty>(
+            PropertyInfo propertyInfo)
+        {
             var parameter = Expression.Parameter(typeof(TParameter));
-            return Expression.Lambda<Func<TParameter, TProperty>>(Expression.Property(parameter, propertyInfo), parameter);
+            return Expression.Lambda<Func<TParameter, TProperty>>(Expression.Property(parameter, propertyInfo),
+                parameter);
         }
     }
 }

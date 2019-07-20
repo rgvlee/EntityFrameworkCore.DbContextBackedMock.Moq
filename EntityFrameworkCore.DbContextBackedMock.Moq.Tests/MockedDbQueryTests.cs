@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
+using Moq;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
     [TestFixture]
@@ -215,6 +217,38 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             var mockedDbQuery = builder.GetMockedDbQueryFor(x => x.TestView);
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbQuery.ToList());
+        }
+
+        [Test]
+        public void SetUpQueryOnMockPostBuilder_Enumeration_ReturnsExpectedResult()
+        {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            dbContextMock.SetUpDbQueryFor(x => x.TestView, expectedResult);
+            
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
+        }
+
+        [Test]
+        public void SetUpQueryOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            var dbQueryMock = mockedDbContext.CreateDbQueryMockFor(x => x.TestView, expectedResult);
+            dbContextMock.SetUpDbQueryFor(x => x.TestView, dbQueryMock);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
         }
     }
 }
