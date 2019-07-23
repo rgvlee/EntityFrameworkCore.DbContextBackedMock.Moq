@@ -281,5 +281,45 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
 
             CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
         }
+
+        [Test]
+        public void SetUpQuery_First_ReturnsExpectedResult() {
+            var dataSource = new List<TestEntity2>() { new TestEntity2() { Id = Guid.NewGuid() }, new TestEntity2() { Id = Guid.NewGuid() } };
+
+            var expectedResult = dataSource.First();
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, dataSource);
+            var mockedContext = builder.GetMockedDbContext();
+
+            var actualResult1 = mockedContext.Query<TestEntity2>().First(x => x.Id == expectedResult.Id);
+            var actualResult2 = mockedContext.Query<TestEntity2>().First(x => x.Id == expectedResult.Id);
+
+            Assert.Multiple(() => {
+                Assert.AreSame(expectedResult, actualResult1);
+                Assert.AreSame(actualResult1, actualResult2);
+
+                Assert.AreSame(expectedResult, mockedContext.TestView.First(x => x.Id == expectedResult.Id));
+            });
+        }
+
+        [Test]
+        public void SetUpQuery_Where_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2() { Id = Guid.NewGuid() }, new TestEntity2() { Id = Guid.NewGuid() } };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            builder.AddSetUpFor(x => x.TestView, expectedResult);
+            var mockedContext = builder.GetMockedDbContext();
+
+            var actualResult1 = mockedContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+            var actualResult2 = mockedContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+
+            Assert.Multiple(() => {
+                CollectionAssert.AreEquivalent(expectedResult, actualResult1);
+                CollectionAssert.AreEquivalent(actualResult1, actualResult2);
+
+                CollectionAssert.AreEquivalent(expectedResult, mockedContext.TestView.Where(x => x.Id != default(Guid)));
+            });
+        }
     }
 }
