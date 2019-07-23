@@ -220,7 +220,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpQueryByExpressionOnMockPostBuilder_Enumeration_ReturnsExpectedResult()
+        public void SetUpQueryUsingEnumerationByExpressionOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult()
         {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
@@ -236,7 +236,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpQueryByExpressionOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
+        public void SetUpQueryUsingDbQueryMockByExpressionOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -252,7 +252,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
         
         [Test]
-        public void SetUpQueryByTypeOnMockPostBuilder_Enumeration_ReturnsExpectedResult() {
+        public void SetUpQueryUsingEnumerationByTypeOnMockPostBuilder_Enumeration_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -267,7 +267,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
         }
 
         [Test]
-        public void SetUpQueryByTypeOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
+        public void SetUpQueryUsingDbQueryMockByTypeOnMockedDbContextPostBuilder_Enumeration_ReturnsExpectedResult() {
             var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
 
             var builder = new DbContextMockBuilder<TestContext>();
@@ -319,6 +319,68 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
                 CollectionAssert.AreEquivalent(actualResult1, actualResult2);
 
                 CollectionAssert.AreEquivalent(expectedResult, mockedContext.TestView.Where(x => x.Id != default(Guid)));
+            });
+        }
+
+        [Test]
+        public void SetUpQueryUsingEnumerationByTypeOnMockPostBuilder_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2(), new TestEntity2() };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            dbContextMock.SetUpDbQueryFor(expectedResult);
+
+            CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.ToList());
+        }
+
+        [Test]
+        public void SetUpQueryUsingDbQueryMockByTypeOnMockedDbContextPostBuilder_Where_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2() { Id = Guid.NewGuid() }, new TestEntity2() { Id = Guid.NewGuid() } };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            var dbQueryMock = mockedDbContext.CreateDbQueryMockFor(expectedResult);
+            dbContextMock.SetUpDbQueryFor(dbQueryMock);
+
+            var actualResult1 = mockedDbContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+            var actualResult2 = mockedDbContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+
+            Assert.Multiple(() => {
+                CollectionAssert.AreEquivalent(expectedResult, actualResult1);
+                CollectionAssert.AreEquivalent(actualResult1, actualResult2);
+
+                CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.Where(x => x.Id != default(Guid)));
+            });
+        }
+
+        [Test]
+        public void SetUpQueryUsingEnumerationByTypeOnMockPostBuilder_Where_ReturnsExpectedResult() {
+            var expectedResult = new List<TestEntity2>() { new TestEntity2() { Id = Guid.NewGuid() }, new TestEntity2() { Id = Guid.NewGuid() } };
+
+            var builder = new DbContextMockBuilder<TestContext>();
+            var dbContextMock = builder.GetDbContextMock();
+            var mockedDbContext = builder.GetMockedDbContext();
+
+            //Assuming that at this point our tests don't have access to the builder; but we have
+            //retained the dbContextMock and mockedDbContext
+            dbContextMock.SetUpDbQueryFor(expectedResult);
+
+            var actualResult1 = mockedDbContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+            var actualResult2 = mockedDbContext.Query<TestEntity2>().Where(x => x.Id != default(Guid));
+
+            Assert.Multiple(() => {
+                CollectionAssert.AreEquivalent(expectedResult, actualResult1);
+                CollectionAssert.AreEquivalent(actualResult1, actualResult2);
+
+                CollectionAssert.AreEquivalent(expectedResult, mockedDbContext.TestView.Where(x => x.Id != default(Guid)));
             });
         }
     }
