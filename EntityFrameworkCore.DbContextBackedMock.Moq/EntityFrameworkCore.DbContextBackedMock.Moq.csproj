@@ -15,7 +15,7 @@ Designed to be used with the in-memory provider to provide a complete DbContext 
     <PackageProjectUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq</RepositoryUrl>
     <PackageTags>moq mock EntityFrameworkCore efcore entity framework core EntityFramework InMemory In-Memory DbContext Context testing test tests FromSql ExecuteSqlCommand DbQuery</PackageTags>
-    <PackageLicenseUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq/blob/master/License.txt</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright (c) 2019 Lee Anderson</Copyright>
     <PackageId>EntityFrameworkCore.DbContextBackedMock.Moq</PackageId>
     <Product>EntityFrameworkCore.DbContextBackedMock.Moq</Product>
