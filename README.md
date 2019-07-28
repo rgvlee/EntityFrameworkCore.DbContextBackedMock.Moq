@@ -15,11 +15,11 @@ And that's just what this library does. The mocks will funnel the majority of th
 - [Source repository](https://github.com/rgvlee/EntityFrameworkCore.DbContextBackedMock.Moq)
 - [NuGet](https://www.nuget.org/packages/EntityFrameworkCore.DbContextBackedMock.Moq/)
 
-## Fluent interface
-The builder provides a fluent interface for building the mocks so it should be intuitive and discoverable. The examples below touch on a bit of the available functionality.
-
 ## The disclaimer
 The library sets up a lot of the DbContext functionality but I am not going to claim it does everything. I have built this based on my current needs. If you find this library useful and something is missing, not working as you'd expect or you need additional behaviour mocked flick me a message and I'll see what I can do.
+
+## Fluent interface
+The builder provides a fluent interface for building the mocks so it should be intuitive and discoverable. The examples below touch on a bit of the available functionality.
 
 ## Example Usage
 - Create the builder
