@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EntityFrameworkCore.DbContextBackedMock.Moq.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -8,6 +9,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
     /// <summary>
     ///     Extensions for db queries.
     /// </summary>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public static class DbQueryExtensions
     {
         /// <summary>

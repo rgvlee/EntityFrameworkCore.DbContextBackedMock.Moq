@@ -7,6 +7,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers
     /// <summary>
     ///     Helper methods for expressions.
     /// </summary>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public static class ExpressionHelper
     {
         /// <summary>

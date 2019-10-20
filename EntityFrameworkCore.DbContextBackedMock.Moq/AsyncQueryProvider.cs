@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -11,6 +12,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq
     ///     Provides an asynchronous query provider for an enumerable sequence.
     /// </summary>
     /// <typeparam name="T">The enumerable sequence element type.</typeparam>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public class AsyncQueryProvider<T> : IAsyncQueryProvider
     {
         private readonly IQueryable _sequence;

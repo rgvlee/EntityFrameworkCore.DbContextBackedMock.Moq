@@ -1,6 +1,8 @@
 # EntityFrameworkCore.DbContextBackedMock.Moq
 __*The EntityFrameworkCore FromSql, ExecuteSqlCommand and DbQuery<> mocking library*__
 
+# This repo has moved to [EntityFrameworkCore.Testing](https://github.com/rgvlee/EntityFrameworkCore.Testing)
+
 EntityFrameworkCore.DbContextBackedMock.Moq allows you to create a mock DbContext and have it backed by an actual DbContext.
 
 But why? There's a couple of reasons and it's from my own experience using the [Microsoft in-memory provider](https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/in-memory) in unit tests.

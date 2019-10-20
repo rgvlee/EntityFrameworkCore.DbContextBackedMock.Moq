@@ -12,6 +12,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers
     /// <summary>
     ///     Helper methods for db queries.
     /// </summary>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public class DbQueryHelper
     {
         /// <summary>

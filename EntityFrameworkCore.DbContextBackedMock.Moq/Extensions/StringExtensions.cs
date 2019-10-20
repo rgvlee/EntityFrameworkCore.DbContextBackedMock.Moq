@@ -5,6 +5,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
     /// <summary>
     ///     Extensions for strings.
     /// </summary>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     internal static class StringExtensions
     {
         /// <summary>

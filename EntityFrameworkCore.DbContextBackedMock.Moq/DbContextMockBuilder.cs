@@ -15,6 +15,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq
     ///     A builder that creates a DbContext mock.
     /// </summary>
     /// <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public class DbContextMockBuilder<TDbContext>
         where TDbContext : DbContext
     {

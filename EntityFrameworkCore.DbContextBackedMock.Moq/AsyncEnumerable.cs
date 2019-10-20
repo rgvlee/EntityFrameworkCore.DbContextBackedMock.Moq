@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq
 {
     /// <inheritdoc cref="IAsyncEnumerable{T}" />
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public class AsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>
     {
         /// <summary>

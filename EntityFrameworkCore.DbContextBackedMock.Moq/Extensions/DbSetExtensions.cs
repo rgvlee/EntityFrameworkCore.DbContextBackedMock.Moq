@@ -14,6 +14,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
     /// <summary>
     ///     Extensions for db sets.
     /// </summary>
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     public static class DbSetExtensions
     {
         /// <summary>

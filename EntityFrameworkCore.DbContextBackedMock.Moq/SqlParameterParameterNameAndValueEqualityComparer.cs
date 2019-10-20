@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 
 namespace EntityFrameworkCore.DbContextBackedMock.Moq
 {
+    [Obsolete("This package has moved to https://www.nuget.org/packages/EntityFrameworkCore.Testing.Moq/. This package will be unlisted at a later date.")]
     internal class SqlParameterParameterNameAndValueEqualityComparer : EqualityComparer<SqlParameter>
     {
         public override bool Equals(SqlParameter x, SqlParameter y)
