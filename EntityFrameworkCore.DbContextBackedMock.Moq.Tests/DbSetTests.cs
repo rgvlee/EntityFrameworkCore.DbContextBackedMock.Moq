@@ -1,19 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using EntityFrameworkCore.DbContextBackedMock.Moq.Extensions;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests
+{
     [TestFixture]
-    public class DbSetTests {
+    public class DbSetTests
+    {
         [Test]
-        public void AddAndPersist_Entity_Persists() {
+        public void AddAndPersist_Entity_Persists()
+        {
             var testEntity1 = new TestEntity1();
 
             var options = new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
@@ -23,14 +21,16 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             dbSet.Add(testEntity1);
             dbContext.SaveChanges();
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.IsTrue(dbContext.Set<TestEntity1>().Any());
                 Assert.IsTrue(dbContext.TestEntities.Any());
             });
         }
 
         [Test]
-        public async Task AddAndPersistAsync_Entity_Persists() {
+        public async Task AddAndPersistAsync_Entity_Persists()
+        {
             var testEntity1 = new TestEntity1();
 
             var options = new DbContextOptionsBuilder<TestContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
@@ -40,7 +40,8 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
             await dbSet.AddAsync(testEntity1);
             await dbContext.SaveChangesAsync();
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.IsTrue(dbContext.Set<TestEntity1>().Any());
                 Assert.IsTrue(dbContext.TestEntities.Any());
             });

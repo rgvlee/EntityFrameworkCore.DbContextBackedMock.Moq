@@ -6,12 +6,12 @@ using Moq;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
 {
     /// <summary>
-    /// Extensions for db queries.
+    ///     Extensions for db queries.
     /// </summary>
     public static class DbQueryExtensions
     {
         /// <summary>
-        /// Creates and sets up a DbQuery mock for the specified entity.
+        ///     Creates and sets up a DbQuery mock for the specified entity.
         /// </summary>
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <param name="dbQuery">The DbQuery to mock.</param>

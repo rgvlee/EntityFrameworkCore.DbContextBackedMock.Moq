@@ -11,12 +11,12 @@ using Moq;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
 {
     /// <summary>
-    /// Extensions for db contexts.
+    ///     Extensions for db contexts.
     /// </summary>
     public static class DbContextExtensions
     {
         /// <summary>
-        /// Creates and sets up a DbContext mock that delegates over the specified DbContext.
+        ///     Creates and sets up a DbContext mock that delegates over the specified DbContext.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext to mock type.</typeparam>
         /// <param name="dbContextToMock">The DbContext to mock.</param>
@@ -120,7 +120,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Creates and sets up a DbQuery mock for the specified entity.
+        ///     Creates and sets up a DbQuery mock for the specified entity.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -133,11 +133,11 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
             where TDbContext : DbContext
             where TQuery : class
         {
-            return DbQueryHelper.CreateDbQueryMock<TQuery>(sequence);
+            return DbQueryHelper.CreateDbQueryMock(sequence);
         }
 
         /// <summary>
-        /// Creates and sets up a DbQuery mock for the specified entity.
+        ///     Creates and sets up a DbQuery mock for the specified entity.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -147,8 +147,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         public static Mock<DbQuery<TQuery>> CreateDbQueryMockFor<TDbContext, TQuery>(this TDbContext dbContext,
             IEnumerable<TQuery> sequence)
             where TDbContext : DbContext
-            where TQuery : class {
-            return DbQueryHelper.CreateDbQueryMock<TQuery>(sequence);
+            where TQuery : class
+        {
+            return DbQueryHelper.CreateDbQueryMock(sequence);
         }
     }
 }

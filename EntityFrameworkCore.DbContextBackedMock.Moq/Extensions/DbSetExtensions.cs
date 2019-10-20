@@ -12,12 +12,12 @@ using Moq;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
 {
     /// <summary>
-    /// Extensions for db sets.
+    ///     Extensions for db sets.
     /// </summary>
     public static class DbSetExtensions
     {
         /// <summary>
-        /// Creates and sets up a DbSet mock for the specified entity.
+        ///     Creates and sets up a DbSet mock for the specified entity.
         /// </summary>
         /// <typeparam name="TEntity">The DbSet entity type.</typeparam>
         /// <param name="dbSet">The DbSet to mock.</param>

@@ -5,12 +5,12 @@ using System.Reflection;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers
 {
     /// <summary>
-    /// Helper methods for expressions.
+    ///     Helper methods for expressions.
     /// </summary>
     public static class ExpressionHelper
     {
         /// <summary>
-        /// Creates a property expression.
+        ///     Creates a property expression.
         /// </summary>
         /// <typeparam name="TParameter">The expression parameter.</typeparam>
         /// <typeparam name="TProperty">The expression property.</typeparam>

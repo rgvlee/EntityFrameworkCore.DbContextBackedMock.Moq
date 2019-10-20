@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests {
-    public interface IRepository<TEntity> where TEntity : class {
+namespace EntityFrameworkCore.DbContextBackedMock.Moq.Tests
+{
+    public interface IRepository<TEntity> where TEntity : class
+    {
         IEnumerable<TEntity> GetAll();
         TEntity GetById(Guid id);
         void Add(TEntity entity);

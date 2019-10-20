@@ -16,12 +16,12 @@ using Moq;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
 {
     /// <summary>
-    /// Extensions for mocks.
+    ///     Extensions for mocks.
     /// </summary>
     public static class MockExtensions
     {
         /// <summary>
-        /// Sets up the provider for a DbQuery mock.
+        ///     Sets up the provider for a DbQuery mock.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="dbQueryMock">The DbQuery mock.</param>
@@ -36,7 +36,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Sets up the provider for a DbSet mock.
+        ///     Sets up the provider for a DbSet mock.
         /// </summary>
         /// <typeparam name="TEntity">The entity type.</typeparam>
         /// <param name="dbSetMock">The DbSet mock.</param>
@@ -51,7 +51,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Sets up the provider for a queryable mock.
+        ///     Sets up the provider for a queryable mock.
         /// </summary>
         /// <typeparam name="T">The queryable type.</typeparam>
         /// <param name="queryableMock">The queryable mock.</param>
@@ -66,7 +66,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Sets up a query for a DbContext mock.
+        ///     Sets up a query for a DbContext mock.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -80,7 +80,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
             where TDbContext : DbContext
             where TQuery : class
         {
-           dbContextMock.Setup(expression)
+            dbContextMock.Setup(expression)
                 .Callback(() => ((IEnumerable<TQuery>) dbQueryMock.Object).GetEnumerator().Reset())
                 .Returns(() => dbQueryMock.Object);
 
@@ -92,7 +92,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Sets up a query for a DbContext mock.
+        ///     Sets up a query for a DbContext mock.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -110,9 +110,9 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
             dbContextMock.SetUpDbQueryFor(expression, dbQueryMock);
             return dbContextMock;
         }
-        
+
         /// <summary>
-        /// Sets up a query for a DbContext mock.
+        ///     Sets up a query for a DbContext mock.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -122,7 +122,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         public static Mock<TDbContext> SetUpDbQueryFor<TDbContext, TQuery>(this Mock<TDbContext> dbContextMock,
             Mock<DbQuery<TQuery>> dbQueryMock)
             where TDbContext : DbContext
-            where TQuery : class 
+            where TQuery : class
         {
             var properties = typeof(TDbContext).GetProperties().Where(p =>
                 p.PropertyType.IsGenericType && //must be a generic type for the next part of the predicate
@@ -136,7 +136,7 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         }
 
         /// <summary>
-        /// Sets up a query for a DbContext mock.
+        ///     Sets up a query for a DbContext mock.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <typeparam name="TQuery">The query type.</typeparam>
@@ -146,21 +146,27 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
         public static Mock<TDbContext> SetUpDbQueryFor<TDbContext, TQuery>(this Mock<TDbContext> dbContextMock,
             IEnumerable<TQuery> sequence)
             where TDbContext : DbContext
-            where TQuery : class 
+            where TQuery : class
         {
             var dbQueryMock = DbQueryHelper.CreateDbQueryMock(sequence);
             dbContextMock.SetUpDbQueryFor(dbQueryMock);
             return dbContextMock;
         }
 
-
         /// <summary>
-        /// Sets up ExecuteSqlCommand invocations containing a specified sql string and sql parameters to return a specified result. 
+        ///     Sets up ExecuteSqlCommand invocations containing a specified sql string and sql parameters to return a specified
+        ///     result.
         /// </summary>
         /// <typeparam name="TDbContext">The DbContext type.</typeparam>
         /// <param name="dbContextMock">The DbContext mock</param>
-        /// <param name="executeSqlCommandCommandText">The ExecuteSqlCommand sql string. Mock set up supports case insensitive partial matches.</param>
-        /// <param name="sqlParameters">The ExecuteSqlCommand sql parameters. Mock set up supports case insensitive partial sql parameter sequence matching.</param>
+        /// <param name="executeSqlCommandCommandText">
+        ///     The ExecuteSqlCommand sql string. Mock set up supports case insensitive
+        ///     partial matches.
+        /// </param>
+        /// <param name="sqlParameters">
+        ///     The ExecuteSqlCommand sql parameters. Mock set up supports case insensitive partial sql
+        ///     parameter sequence matching.
+        /// </param>
         /// <param name="expectedResult">The integer to return when ExecuteSqlCommand is invoked.</param>
         /// <returns>The DbContext mock.</returns>
         public static Mock<TDbContext> AddExecuteSqlCommandResult<TDbContext>(this Mock<TDbContext> dbContextMock,
@@ -184,17 +190,19 @@ namespace EntityFrameworkCore.DbContextBackedMock.Moq.Extensions
 
             var rawSqlCommandBuilder = new Mock<IRawSqlCommandBuilder>();
             rawSqlCommandBuilder.Setup(m => m.Build(It.Is<string>(s => s.Contains(executeSqlCommandCommandText, StringComparison.CurrentCultureIgnoreCase)), It.Is<IEnumerable<object>>(
-                    parameters => !sqlParameters.Except(parameters.Select(p => (SqlParameter)p), new SqlParameterParameterNameAndValueEqualityComparer()).Any()
-                    )))
+                    parameters => !sqlParameters.Except(parameters.Select(p => (SqlParameter) p), new SqlParameterParameterNameAndValueEqualityComparer()).Any()
+                )))
                 .Returns(rawSqlCommand.Object)
-                .Callback((string sql, IEnumerable<object> parameters) => {
+                .Callback((string sql, IEnumerable<object> parameters) =>
+                {
                     var sb = new StringBuilder();
                     sb.Append(sql.GetType().Name);
                     sb.Append(" sql: ");
                     sb.AppendLine(sql);
 
                     sb.AppendLine("Parameters:");
-                    foreach (var sqlParameter in parameters.Select(p => (SqlParameter)p)) {
+                    foreach (var sqlParameter in parameters.Select(p => (SqlParameter) p))
+                    {
                         sb.Append(sqlParameter.ParameterName);
                         sb.Append(": ");
                         if (sqlParameter.Value == null)

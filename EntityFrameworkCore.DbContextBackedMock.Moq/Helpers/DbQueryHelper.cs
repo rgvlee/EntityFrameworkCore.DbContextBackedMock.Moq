@@ -10,12 +10,12 @@ using Moq;
 namespace EntityFrameworkCore.DbContextBackedMock.Moq.Helpers
 {
     /// <summary>
-    /// Helper methods for db queries.
+    ///     Helper methods for db queries.
     /// </summary>
     public class DbQueryHelper
     {
         /// <summary>
-        /// Creates and sets up a DbQuery mock for the specified entity.
+        ///     Creates and sets up a DbQuery mock for the specified entity.
         /// </summary>
         /// <typeparam name="TQuery">The query type.</typeparam>
         /// <param name="sequence">The sequence to use for the DbQuery.</param>
